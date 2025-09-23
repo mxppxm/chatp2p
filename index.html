@@ -228,24 +228,78 @@
           candidates.push(match[1]);
         }
 
-        // 压缩成短码格式：类型.会话ID.端口.IP.用户名.密码.指纹.候选者
-        const compressed = [
-          type,
-          sessionId.slice(-8), // 只取后8位
+        // 压缩成安全格式，避免URL识别问题
+        const data = [
+          type === "offer" ? "O" : "A", // 用单字母代替
+          sessionId.slice(-8),
           port,
-          ip,
-          ufrag,
-          pwd.slice(0, 12), // 只取前12位
-          fingerprint.slice(0, 16), // 只取前16位
-          candidates.join(","),
-        ].join(".");
+          ip.replace(/\./g, "_"), // 把IP中的点替换为下划线
+          ufrag.replace(/[+/=]/g, ""), // 移除可能的URL字符
+          pwd.slice(0, 12).replace(/[+/=]/g, ""), // 移除可能的URL字符
+          fingerprint.slice(0, 16),
+          candidates.length.toString(), // 只保存候选者数量，简化处理
+        ];
 
-        return compressed;
+        // 用下划线连接，加前缀避免URL识别
+        return "CHAT_" + data.join("_");
       }
 
       // SDP解压器 - 把短码还原成完整JSON
       function decompressSDP(compressed) {
         try {
+          // 处理新格式：CHAT_开头，下划线分隔
+          if (compressed.startsWith("CHAT_")) {
+            const parts = compressed.substring(5).split("_"); // 移除CHAT_前缀
+            if (parts.length < 8) throw new Error("无效格式");
+
+            const [
+              typeCode,
+              sessionIdSuffix,
+              port,
+              ipWithUnderscore,
+              ufrag,
+              pwdPrefix,
+              fingerprintPrefix,
+              candidatesCount,
+            ] = parts;
+
+            // 重建数据
+            const type = typeCode === "O" ? "offer" : "answer";
+            const fullSessionId =
+              "4389441879" + sessionIdSuffix.padStart(8, "0");
+            const ip = ipWithUnderscore.replace(/_/g, "."); // 恢复IP格式
+            const fullPwd = pwdPrefix + "ABCD1234";
+            const fullFingerprint =
+              fingerprintPrefix.match(/.{2}/g)?.join(":").toUpperCase() || "";
+
+            // 重建SDP
+            let sdp = `v=0\r\n`;
+            sdp += `o=- ${fullSessionId} 2 IN IP4 127.0.0.1\r\n`;
+            sdp += `s=-\r\n`;
+            sdp += `t=0 0\r\n`;
+            sdp += `a=group:BUNDLE 0\r\n`;
+            sdp += `a=extmap-allow-mixed\r\n`;
+            sdp += `a=msid-semantic: WMS\r\n`;
+            sdp += `m=application ${port} UDP/DTLS/SCTP webrtc-datachannel\r\n`;
+            sdp += `c=IN IP4 ${ip}\r\n`;
+
+            // 添加简化的候选者（用通用格式）
+            sdp += `a=candidate:1 1 udp 2113667326 ${ip} ${port} typ host generation 0\r\n`;
+            sdp += `a=candidate:2 1 udp 1677729535 ${ip} ${port} typ srflx raddr 0.0.0.0 rport 0 generation 0\r\n`;
+
+            sdp += `a=ice-ufrag:${ufrag}\r\n`;
+            sdp += `a=ice-pwd:${fullPwd}\r\n`;
+            sdp += `a=ice-options:trickle\r\n`;
+            sdp += `a=fingerprint:sha-256 ${fullFingerprint}\r\n`;
+            sdp += `a=setup:actpass\r\n`;
+            sdp += `a=mid:0\r\n`;
+            sdp += `a=sctp-port:5000\r\n`;
+            sdp += `a=max-message-size:262144\r\n`;
+
+            return new RTCSessionDescription({ type, sdp });
+          }
+
+          // 向后兼容旧格式（点号分隔）
           const parts = compressed.split(".");
           if (parts.length < 7) throw new Error("无效格式");
 
@@ -260,15 +314,12 @@
             candidatesStr,
           ] = parts;
 
-          // 重建完整数据（用合理的默认值）
           const fullSessionId = "4389441879" + sessionIdSuffix.padStart(8, "0");
-          const fullPwd = pwdPrefix + "ABCD1234"; // 补齐密码
+          const fullPwd = pwdPrefix + "ABCD1234";
           const fullFingerprint =
             fingerprintPrefix.match(/.{2}/g)?.join(":").toUpperCase() || "";
 
-          const candidates = candidatesStr ? candidatesStr.split(",") : [];
-
-          // 重建SDP
+          // 重建SDP（旧格式兼容）
           let sdp = `v=0\r\n`;
           sdp += `o=- ${fullSessionId} 2 IN IP4 127.0.0.1\r\n`;
           sdp += `s=-\r\n`;
@@ -278,12 +329,8 @@
           sdp += `a=msid-semantic: WMS\r\n`;
           sdp += `m=application ${port} UDP/DTLS/SCTP webrtc-datachannel\r\n`;
           sdp += `c=IN IP4 ${ip}\r\n`;
-
-          // 添加候选者
-          candidates.forEach((candidate) => {
-            sdp += `a=candidate:${candidate}\r\n`;
-          });
-
+          sdp += `a=candidate:1 1 udp 2113667326 ${ip} ${port} typ host generation 0\r\n`;
+          sdp += `a=candidate:2 1 udp 1677729535 ${ip} ${port} typ srflx raddr 0.0.0.0 rport 0 generation 0\r\n`;
           sdp += `a=ice-ufrag:${ufrag}\r\n`;
           sdp += `a=ice-pwd:${fullPwd}\r\n`;
           sdp += `a=ice-options:trickle\r\n`;
@@ -415,13 +462,16 @@
           if (code.startsWith("{")) {
             // 原始JSON格式
             desc = new RTCSessionDescription(JSON.parse(code));
-          } else {
-            // 压缩格式
+          } else if (code.startsWith("CHAT_") || code.includes(".")) {
+            // 新压缩格式或旧压缩格式
             desc = decompressSDP(code);
             if (!desc) {
               alert("连接码格式错误，请检查");
               return;
             }
+          } else {
+            alert("不识别的连接码格式");
+            return;
           }
 
           if (desc.type === "offer") {
