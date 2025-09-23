@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>超简单聊天</title>
     <style>
+      * {
+        box-sizing: border-box; /* 全局设置，避免元素超出 */
+      }
+
       body {
         font-family: Arial, sans-serif;
         padding: 20px;
@@ -59,29 +63,80 @@
         resize: none;
       }
       #messages {
-        background: #f8f9fa;
-        border: 2px solid #ddd;
-        border-radius: 10px;
-        height: 200px;
+        background: #ffffff;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        height: 300px;
         overflow-y: auto;
-        padding: 15px;
+        padding: 20px;
         margin: 20px 0;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
       }
       .message {
-        margin: 10px 0;
-        padding: 8px 12px;
-        border-radius: 15px;
-        max-width: 80%;
+        margin: 12px 0;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 75%;
+        word-wrap: break-word;
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
       }
       .me {
-        background: #007bff;
+        background: linear-gradient(135deg, #007bff, #0056b3);
         color: white;
         margin-left: auto;
         text-align: right;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+      }
+      .me::after {
+        content: "";
+        position: absolute;
+        right: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border: 8px solid transparent;
+        border-left-color: #007bff;
       }
       .them {
-        background: #e9ecef;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
         color: #333;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .them::after {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border: 8px solid transparent;
+        border-right-color: #f8f9fa;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 聊天框为空时的提示 */
+      #messages:empty::before {
+        content: "💬 聊天消息会在这里显示...";
+        color: #999;
+        font-style: italic;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
       }
       #messageInput {
         width: 70%;
@@ -297,70 +352,83 @@
         elements.status.style.color = color;
       }
 
-      // SDP压缩器 - 把长长的JSON变成短码
+      // SDP压缩器 - 简单Base64压缩，避免解析问题
       function compressSDP(sessionDescription) {
-        const sdp = sessionDescription.sdp;
-        const type = sessionDescription.type;
+        try {
+          // 直接Base64编码整个JSON，但进行URL安全处理
+          const jsonString = JSON.stringify(sessionDescription);
+          const base64 = btoa(jsonString);
 
-        // 提取关键信息
-        const sessionId = sdp.match(/o=- (\d+)/)?.[1] || "";
-        const port = sdp.match(/m=application (\d+)/)?.[1] || "";
-        const ip = sdp.match(/c=IN IP4 ([\d.]+)/)?.[1] || "";
-        const ufrag = sdp.match(/a=ice-ufrag:(\S+)/)?.[1] || "";
-        const pwd = sdp.match(/a=ice-pwd:(\S+)/)?.[1] || "";
-        const fingerprint =
-          sdp.match(/a=fingerprint:sha-256 ([\w:]+)/)?.[1]?.replace(/:/g, "") ||
-          "";
+          // 替换URL敏感字符，避免被识别为链接
+          const urlSafe = base64
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=/g, "");
 
-        // 提取候选者
-        const candidates = [];
-        const candidateRegex = /a=candidate:(\S+)/g;
-        let match;
-        while ((match = candidateRegex.exec(sdp)) !== null) {
-          candidates.push(match[1]);
+          return "CHAT" + urlSafe; // 添加前缀避免URL识别
+        } catch (e) {
+          console.error("压缩失败:", e);
+          return JSON.stringify(sessionDescription); // 降级到原始格式
         }
-
-        // 压缩成安全格式，避免URL识别问题
-        const data = [
-          type === "offer" ? "O" : "A", // 用单字母代替
-          sessionId.slice(-8),
-          port,
-          ip.replace(/\./g, "_"), // 把IP中的点替换为下划线
-          ufrag.replace(/[+/=]/g, ""), // 移除可能的URL字符
-          pwd.slice(0, 12).replace(/[+/=]/g, ""), // 移除可能的URL字符
-          fingerprint.slice(0, 16),
-          candidates.length.toString(), // 只保存候选者数量，简化处理
-        ];
-
-        // 用下划线连接，加前缀避免URL识别
-        return "CHAT_" + data.join("_");
       }
 
       // SDP解压器 - 把短码还原成完整JSON
       function decompressSDP(compressed) {
         try {
-          // 处理新格式：CHAT_开头，下划线分隔
+          // 处理新的Base64格式：CHAT开头（无下划线）
+          if (compressed.startsWith("CHAT") && !compressed.includes("_")) {
+            console.log("检测到Base64格式连接码");
+            const base64Part = compressed.substring(4); // 移除CHAT前缀
+
+            // 恢复Base64格式
+            const base64 = base64Part.replace(/-/g, "+").replace(/_/g, "/");
+
+            // 补齐padding
+            const padding = "=".repeat((4 - (base64.length % 4)) % 4);
+            const fullBase64 = base64 + padding;
+
+            // 解码JSON
+            const jsonString = atob(fullBase64);
+            const sessionDescription = JSON.parse(jsonString);
+
+            console.log("Base64解码成功");
+            return new RTCSessionDescription(sessionDescription);
+          }
+
+          // 处理旧格式：CHAT_开头，下划线分隔（向后兼容）
           if (compressed.startsWith("CHAT_")) {
-            const parts = compressed.substring(5).split("_"); // 移除CHAT_前缀
-            if (parts.length < 8) throw new Error("无效格式");
+            const parts = compressed.substring(5).split("_");
+            console.log("解析旧格式连接码：", parts);
+            console.log("连接码部分数量：", parts.length);
 
-            const [
-              typeCode,
-              sessionIdSuffix,
-              port,
-              ipWithUnderscore,
-              ufrag,
-              pwdPrefix,
-              fingerprintPrefix,
-              candidatesCount,
-            ] = parts;
+            let ip, ufrag, pwdPrefix, fingerprintPrefix, candidatesCount;
 
-            // 重建数据
+            if (parts.length >= 11) {
+              // 旧格式：IP被分成4个部分
+              ip = parts.slice(3, 7).join(".");
+              ufrag = parts[7];
+              pwdPrefix = parts[8];
+              fingerprintPrefix = parts[9];
+              candidatesCount = parts[10];
+            } else if (parts.length === 8 && parts[3].includes("X")) {
+              // 中间格式：IP用X分隔
+              ip = parts[3].replace(/X/g, ".");
+              ufrag = parts[4];
+              pwdPrefix = parts[5];
+              fingerprintPrefix = parts[6];
+              candidatesCount = parts[7];
+            } else {
+              throw new Error(`无法解析旧格式：部分数量${parts.length}`);
+            }
+
+            const [typeCode, sessionIdSuffix, port] = parts;
             const type = typeCode === "O" ? "offer" : "answer";
             const fullSessionId =
               "4389441879" + sessionIdSuffix.padStart(8, "0");
-            const ip = ipWithUnderscore.replace(/_/g, "."); // 恢复IP格式
-            const fullPwd = pwdPrefix + "ABCD1234";
+            const fullPwd =
+              pwdPrefix.length >= 22
+                ? pwdPrefix
+                : pwdPrefix + "ABCD1234567890ABCD12";
             const fullFingerprint =
               fingerprintPrefix.match(/.{2}/g)?.join(":").toUpperCase() || "";
 
@@ -374,11 +442,8 @@
             sdp += `a=msid-semantic: WMS\r\n`;
             sdp += `m=application ${port} UDP/DTLS/SCTP webrtc-datachannel\r\n`;
             sdp += `c=IN IP4 ${ip}\r\n`;
-
-            // 添加简化的候选者（用通用格式）
             sdp += `a=candidate:1 1 udp 2113667326 ${ip} ${port} typ host generation 0\r\n`;
             sdp += `a=candidate:2 1 udp 1677729535 ${ip} ${port} typ srflx raddr 0.0.0.0 rport 0 generation 0\r\n`;
-
             sdp += `a=ice-ufrag:${ufrag}\r\n`;
             sdp += `a=ice-pwd:${fullPwd}\r\n`;
             sdp += `a=ice-options:trickle\r\n`;
@@ -391,48 +456,8 @@
             return new RTCSessionDescription({ type, sdp });
           }
 
-          // 向后兼容旧格式（点号分隔）
-          const parts = compressed.split(".");
-          if (parts.length < 7) throw new Error("无效格式");
-
-          const [
-            type,
-            sessionIdSuffix,
-            port,
-            ip,
-            ufrag,
-            pwdPrefix,
-            fingerprintPrefix,
-            candidatesStr,
-          ] = parts;
-
-          const fullSessionId = "4389441879" + sessionIdSuffix.padStart(8, "0");
-          const fullPwd = pwdPrefix + "ABCD1234";
-          const fullFingerprint =
-            fingerprintPrefix.match(/.{2}/g)?.join(":").toUpperCase() || "";
-
-          // 重建SDP（旧格式兼容）
-          let sdp = `v=0\r\n`;
-          sdp += `o=- ${fullSessionId} 2 IN IP4 127.0.0.1\r\n`;
-          sdp += `s=-\r\n`;
-          sdp += `t=0 0\r\n`;
-          sdp += `a=group:BUNDLE 0\r\n`;
-          sdp += `a=extmap-allow-mixed\r\n`;
-          sdp += `a=msid-semantic: WMS\r\n`;
-          sdp += `m=application ${port} UDP/DTLS/SCTP webrtc-datachannel\r\n`;
-          sdp += `c=IN IP4 ${ip}\r\n`;
-          sdp += `a=candidate:1 1 udp 2113667326 ${ip} ${port} typ host generation 0\r\n`;
-          sdp += `a=candidate:2 1 udp 1677729535 ${ip} ${port} typ srflx raddr 0.0.0.0 rport 0 generation 0\r\n`;
-          sdp += `a=ice-ufrag:${ufrag}\r\n`;
-          sdp += `a=ice-pwd:${fullPwd}\r\n`;
-          sdp += `a=ice-options:trickle\r\n`;
-          sdp += `a=fingerprint:sha-256 ${fullFingerprint}\r\n`;
-          sdp += `a=setup:actpass\r\n`;
-          sdp += `a=mid:0\r\n`;
-          sdp += `a=sctp-port:5000\r\n`;
-          sdp += `a=max-message-size:262144\r\n`;
-
-          return new RTCSessionDescription({ type, sdp });
+          // 处理原始JSON格式
+          return new RTCSessionDescription(JSON.parse(compressed));
         } catch (e) {
           console.error("解压失败:", e);
           return null;
@@ -443,9 +468,32 @@
       function addMessage(text, isMe = false) {
         const div = document.createElement("div");
         div.className = `message ${isMe ? "me" : "them"}`;
-        div.textContent = text;
+
+        // 创建消息内容
+        const messageContent = document.createElement("div");
+        messageContent.textContent = text;
+        messageContent.style.marginBottom = "4px";
+
+        // 创建时间戳
+        const timestamp = document.createElement("div");
+        const now = new Date();
+        timestamp.textContent = now.toLocaleTimeString("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        timestamp.style.fontSize = "10px";
+        timestamp.style.opacity = "0.7";
+        timestamp.style.textAlign = isMe ? "right" : "left";
+
+        div.appendChild(messageContent);
+        div.appendChild(timestamp);
         elements.messages.appendChild(div);
-        elements.messages.scrollTop = elements.messages.scrollHeight;
+
+        // 平滑滚动到底部
+        elements.messages.scrollTo({
+          top: elements.messages.scrollHeight,
+          behavior: "smooth",
+        });
       }
 
       // 创建连接
@@ -502,31 +550,57 @@
         };
 
         channel.onmessage = (e) => {
-          addMessage(`朋友: ${e.data}`);
+          addMessage(e.data, false);
         };
       }
 
       // 发送消息
       function sendMessage() {
         const text = elements.messageInput.value.trim();
-        if (!text || !channel || channel.readyState !== "open") return;
+        if (!text || !channel || channel.readyState !== "open") {
+          if (!text) return;
+          if (!channel || channel.readyState !== "open") {
+            alert("连接尚未建立，无法发送消息");
+          }
+          return;
+        }
 
-        channel.send(text);
-        addMessage(`我: ${text}`, true);
-        elements.messageInput.value = "";
+        try {
+          // 通过数据通道发送消息
+          channel.send(text);
+
+          // 显示自己发送的消息
+          addMessage(text, true);
+          elements.messageInput.value = "";
+        } catch (error) {
+          console.error("发送消息失败:", error);
+          alert("发送消息失败: " + error.message);
+        }
       }
 
       // 事件绑定
-      elements.generate.onclick = async () => {
-        setStatus("正在生成连接码...", "#ffc107");
-        pc = createConnection();
-        channel = pc.createDataChannel("chat");
-        setupChannel();
+      console.log("绑定生成按钮事件，按钮元素:", elements.generate);
 
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        waiting = true;
-        elements.myCode.value = "生成中...";
+      elements.generate.onclick = async () => {
+        try {
+          console.log("点击生成连接按钮");
+          setStatus("正在生成连接码...", "#ffc107");
+
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          console.log("开始创建offer");
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          waiting = true;
+          elements.myCode.value = "生成中...";
+          console.log("offer创建完成，等待ICE候选收集");
+        } catch (error) {
+          console.error("生成连接码失败:", error);
+          setStatus("生成失败: " + error.message, "#dc3545");
+          alert("生成连接码失败: " + error.message);
+        }
       };
 
       elements.copy.onclick = async () => {
@@ -554,15 +628,15 @@
           if (code.startsWith("{")) {
             // 原始JSON格式
             desc = new RTCSessionDescription(JSON.parse(code));
-          } else if (code.startsWith("CHAT_") || code.includes(".")) {
-            // 新压缩格式或旧压缩格式
+          } else if (code.startsWith("CHAT")) {
+            // 所有压缩格式：Base64格式、下划线格式、点号格式
             desc = decompressSDP(code);
             if (!desc) {
               alert("连接码格式错误，请检查");
               return;
             }
           } else {
-            alert("不识别的连接码格式");
+            alert("不识别的连接码格式，连接码应该以CHAT开头或者是JSON格式");
             return;
           }
 
