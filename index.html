@@ -622,90 +622,30 @@
         background: #c82333;
       }
 
-      /* 新的简化界面样式 */
-      .welcome-prompt {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-
-      .action-cards {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
-        justify-content: center;
-      }
-
-      .action-card {
-        flex: 1;
-        max-width: 280px;
+      /* 房间输入界面样式 */
+      .room-input-section {
         background: white;
         border-radius: 16px;
-        padding: 30px 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        padding: 30px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border: 2px solid transparent;
+        border: 2px solid #28a745;
+        max-width: 500px;
+        margin: 0 auto;
       }
 
-      .action-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      }
-
-      .primary-card {
-        border-color: #28a745;
-      }
-
-      .primary-card:hover {
-        border-color: #20c997;
-        background: linear-gradient(135deg, #f8fff9, #e6fff0);
-      }
-
-      .secondary-card {
-        border-color: #007bff;
-      }
-
-      .secondary-card:hover {
-        border-color: #0056b3;
-        background: linear-gradient(135deg, #f8fbff, #e6f3ff);
-      }
-
-      .card-icon {
-        font-size: 48px;
+      .welcome-text h3 {
+        color: #28a745;
         margin-bottom: 15px;
-      }
-
-      .action-card h3 {
-        color: #333;
-        margin: 0 0 10px 0;
-        font-size: 20px;
+        text-align: center;
+        font-size: 24px;
         font-weight: 600;
       }
 
-      .action-card p {
+      .welcome-text p {
         color: #666;
-        margin: 0 0 20px 0;
-        font-size: 14px;
-      }
-
-      .card-button {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        display: inline-block;
-        transition: all 0.3s ease;
-      }
-
-      .primary-card .card-button {
-        background: linear-gradient(135deg, #28a745, #20c997);
-      }
-
-      .action-card:hover .card-button {
-        transform: scale(1.05);
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 16px;
       }
 
       /* 详细操作区域样式 */
@@ -819,36 +759,19 @@
         color: white;
       }
 
-      /* 响应式优化 */
+      /* 房间输入界面响应式 */
       @media (max-width: 768px) {
-        .action-cards {
-          flex-direction: column;
-          gap: 15px;
+        .room-input-section {
+          padding: 20px;
+          margin: 10px;
         }
 
-        .action-card {
-          max-width: none;
-          padding: 25px 20px;
+        .welcome-text h3 {
+          font-size: 20px;
         }
 
-        .card-icon {
-          font-size: 40px;
-        }
-
-        .action-card h3 {
-          font-size: 18px;
-        }
-
-        .welcome-prompt h2 {
-          font-size: 24px !important;
-        }
-
-        .welcome-prompt p {
-          font-size: 14px !important;
-        }
-
-        .detail-panel {
-          padding: 20px 15px;
+        .welcome-text p {
+          font-size: 14px;
         }
       }
 
@@ -967,105 +890,135 @@
         class="simplified-header"
         style="display: none"
       >
-        <h2>💬 聊天已连接</h2>
-        <div class="status-info">与朋友的私密聊天，端到端加密</div>
+        <h2 id="chatTitle">💬 聊天已连接</h2>
+        <div id="chatSubtitle" class="status-info">
+          与朋友的私密聊天，端到端加密
+        </div>
       </div>
 
-      <!-- 连接步骤区域 - 连接后隐藏 -->
+      <!-- 房间连接区域 - 连接后隐藏 -->
       <div id="connectionStep" class="connection-step">
-        <div class="welcome-prompt">
-          <h2 style="color: #333; margin-bottom: 15px; font-size: 28px">
-            👋 开始聊天
-          </h2>
-          <p style="color: #666; font-size: 16px; margin-bottom: 30px">
-            选择一个选项开始：
-          </p>
-        </div>
-
-        <div class="action-cards">
-          <!-- 创建连接卡片 -->
-          <div class="action-card primary-card" onclick="startCreate()">
-            <div class="card-icon">🎯</div>
-            <h3>我来创建聊天</h3>
-            <p>生成连接码，发给朋友</p>
-            <div class="card-button">立即创建</div>
+        <!-- GitHub Token 必填提示 -->
+        <div
+          id="tokenRequiredSection"
+          class="room-input-section"
+          style="display: none"
+        >
+          <div class="welcome-text">
+            <h3 style="color: #dc3545; margin-bottom: 15px; text-align: center">
+              🔑 需要GitHub Token
+            </h3>
+            <p style="color: #666; text-align: center; margin-bottom: 20px">
+              房间功能需要GitHub Token才能正常工作
+            </p>
           </div>
 
-          <!-- 加入连接卡片 -->
-          <div class="action-card secondary-card" onclick="startJoin()">
-            <div class="card-icon">🔗</div>
-            <h3>朋友邀请了我</h3>
-            <p>我有朋友的连接码</p>
-            <div class="card-button">立即加入</div>
-          </div>
-        </div>
-
-        <!-- 隐藏的详细操作区域 -->
-        <div id="detailsArea" class="details-area" style="display: none">
-          <div id="createDetails" class="detail-panel" style="display: none">
-            <h4 style="color: #28a745; margin-bottom: 15px">🎯 创建聊天</h4>
-
-            <!-- 隐藏的生成元素，用于后台操作 -->
-            <button
-              id="generate"
-              class="action-button primary"
-              style="display: none"
-            >
-              🎯 创建连接码
-            </button>
-            <textarea
-              id="myCode"
-              class="code-area"
-              placeholder="连接码会在这里生成..."
-              readonly
-              style="display: none"
-            ></textarea>
-            <button
-              id="copy"
-              disabled
-              class="action-button secondary"
-              style="display: none"
-            >
-              📋 复制发给朋友
-            </button>
-
-            <!-- 生成状态提示 -->
-            <div id="generateStatus" class="step-hint" style="display: block">
-              <p style="color: #666; margin-bottom: 15px">
-                🔄 正在生成连接码并自动复制...
-              </p>
+          <div
+            style="
+              background: #fff3cd;
+              border: 1px solid #ffeaa7;
+              border-radius: 8px;
+              padding: 15px;
+              margin-bottom: 20px;
+            "
+          >
+            <div style="font-size: 14px; color: #856404; line-height: 1.5">
+              <strong>📖 获取Token步骤：</strong><br />
+              1. 访问
+              <a
+                href="https://github.com/settings/tokens"
+                target="_blank"
+                style="color: #007bff"
+                >GitHub Settings</a
+              ><br />
+              2. 点击 "Generate new token (classic)"<br />
+              3. 只勾选 "gist" 权限<br />
+              4. 复制生成的Token粘贴到下方
             </div>
+          </div>
 
-            <!-- 应答码输入区 -->
-            <div id="answerSection" style="display: none">
-              <div class="step-hint">
-                <p style="color: #28a745; margin-bottom: 15px">
-                  ✅ 连接码已复制！发给朋友后，粘贴朋友的应答码
-                </p>
-              </div>
-              <textarea
-                id="answerCode"
-                class="code-area"
-                placeholder="粘贴朋友发来的应答码..."
-              ></textarea>
-              <button id="connectAnswer" class="action-button primary">
-                完成连接
+          <input
+            id="githubTokenRequired"
+            type="password"
+            class="code-area"
+            placeholder="粘贴您的GitHub Token..."
+            style="margin-bottom: 15px; font-size: 14px"
+          />
+          <button
+            id="saveToken"
+            class="action-button primary"
+            style="width: 100%"
+          >
+            ✅ 保存Token并继续
+          </button>
+        </div>
+
+        <!-- 主要房间界面 -->
+        <div id="roomMainSection" class="room-input-section">
+          <div class="welcome-text">
+            <h3 style="color: #28a745; margin-bottom: 15px; text-align: center">
+              🏠 房间聊天
+            </h3>
+            <p style="color: #666; text-align: center; margin-bottom: 20px">
+              选择创建新房间或加入现有房间
+            </p>
+          </div>
+
+          <!-- 两个选项：创建房间 vs 加入房间 -->
+          <div style="display: flex; gap: 15px; margin-bottom: 20px">
+            <div style="flex: 1">
+              <button
+                id="createRoomBtn"
+                class="action-button secondary"
+                style="width: 100%; padding: 20px"
+              >
+                🎯 创建房间<br />
+                <small style="font-size: 12px; opacity: 0.8"
+                  >生成房间号并等待朋友</small
+                >
+              </button>
+            </div>
+            <div style="flex: 1">
+              <button
+                id="joinRoomBtn"
+                class="action-button primary"
+                style="width: 100%; padding: 20px"
+              >
+                🔗 加入房间<br />
+                <small style="font-size: 12px; opacity: 0.8"
+                  >输入朋友的房间号</small
+                >
               </button>
             </div>
           </div>
 
-          <div id="joinDetails" class="detail-panel" style="display: none">
-            <h4 style="color: #007bff; margin-bottom: 15px">🔗 加入聊天</h4>
-            <textarea
-              id="theirCode"
+          <!-- 加入房间的输入区域 -->
+          <div id="joinRoomSection" style="display: none">
+            <input
+              id="roomIdInput"
+              type="text"
               class="code-area"
-              placeholder="粘贴朋友的连接码..."
-            ></textarea>
-            <button id="connect" class="action-button primary">立即连接</button>
+              placeholder="输入朋友的房间号，如：ABC123"
+              maxlength="6"
+              style="
+                text-transform: uppercase;
+                text-align: center;
+                font-size: 18px;
+                letter-spacing: 3px;
+                margin-bottom: 15px;
+              "
+            />
+            <button
+              id="joinRoom"
+              class="action-button primary"
+              style="width: 100%"
+            >
+              🚀 加入房间
+            </button>
           </div>
 
-          <div class="back-action">
-            <button onclick="goBack()" class="back-button">← 重新选择</button>
+          <div id="roomStatus" class="step-hint" style="display: none">
+            <p id="roomStatusText">🔄 正在连接房间...</p>
           </div>
         </div>
       </div>
@@ -1213,16 +1166,11 @@
 
     <script>
       const elements = {
-        generate: document.getElementById("generate"),
-        copy: document.getElementById("copy"),
-        myCode: document.getElementById("myCode"),
-        theirCode: document.getElementById("theirCode"),
-        connect: document.getElementById("connect"),
         status: document.getElementById("status"),
         messageInput: document.getElementById("messageInput"),
         send: document.getElementById("send"),
         messages: document.getElementById("messages"),
-        // 新增的UI元素
+        // UI控制元素
         container: document.querySelector(".container"),
         mainTitle: document.getElementById("mainTitle"),
         simplifiedHeader: document.getElementById("simplifiedHeader"),
@@ -1236,19 +1184,32 @@
         previewImg: document.getElementById("previewImg"),
         imageInfo: document.getElementById("imageInfo"),
         cancelImage: document.getElementById("cancelImage"),
-        // 新的连接流程元素
-        generateStatus: document.getElementById("generateStatus"),
-        answerSection: document.getElementById("answerSection"),
-        answerCode: document.getElementById("answerCode"),
-        connectAnswer: document.getElementById("connectAnswer"),
+        // 房间相关元素
+        roomIdInput: document.getElementById("roomIdInput"),
+        joinRoom: document.getElementById("joinRoom"),
+        roomStatus: document.getElementById("roomStatus"),
+        roomStatusText: document.getElementById("roomStatusText"),
+        chatTitle: document.getElementById("chatTitle"),
+        chatSubtitle: document.getElementById("chatSubtitle"),
+        // Token相关元素
+        githubToken: document.getElementById("githubToken"),
+        githubTokenRequired: document.getElementById("githubTokenRequired"),
+        saveToken: document.getElementById("saveToken"),
+        tokenRequiredSection: document.getElementById("tokenRequiredSection"),
+        roomMainSection: document.getElementById("roomMainSection"),
+        // 新的房间选择元素
+        createRoomBtn: document.getElementById("createRoomBtn"),
+        joinRoomBtn: document.getElementById("joinRoomBtn"),
+        joinRoomSection: document.getElementById("joinRoomSection"),
       };
 
       let pc,
         channel,
-        waiting = false,
         currentImage = null, // 当前选择的图片数据
         isTransferring = false, // 是否正在传输
-        transferCancelled = false; // 传输是否被取消
+        transferCancelled = false, // 传输是否被取消
+        currentRoomId = null, // 当前房间ID
+        roomGistId = null; // 房间对应的Gist ID
 
       // Toast 提示函数
       function showToast(message, type = "success") {
@@ -1283,6 +1244,191 @@
         }, 3000);
       }
 
+      // ===== GitHub Token 管理 =====
+
+      // 获取GitHub Token
+      function getGitHubToken() {
+        // 优先使用输入框中的token（检查元素是否存在）
+        if (elements.githubToken && elements.githubToken.value) {
+          const inputToken = elements.githubToken.value.trim();
+          if (inputToken) {
+            // 保存到localStorage
+            localStorage.setItem("githubToken", inputToken);
+            return inputToken;
+          }
+        }
+
+        // 从localStorage获取保存的token
+        return localStorage.getItem("githubToken") || null;
+      }
+
+      // 检查是否有有效的token
+      function hasValidToken() {
+        const token = getGitHubToken();
+        return token && token.length > 10; // 简单验证token格式
+      }
+
+      // 清除token
+      function clearGitHubToken() {
+        localStorage.removeItem("githubToken");
+        elements.githubToken.value = "";
+      }
+
+      // ===== 纯Gist方案：创建独立的offer和answer Gist =====
+
+      // 创建房间Gist的包装函数
+      async function createRoomGist(roomId, roomData) {
+        try {
+          const headers = {
+            "Content-Type": "application/json",
+          };
+
+          const token = getGitHubToken();
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+
+          const response = await fetch("https://api.github.com/gists", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+              description: `Chat Room: ${roomId}`,
+              public: true, // 改为公开，便于搜索
+              files: {
+                [`room_${roomId}.json`]: {
+                  content: JSON.stringify(roomData),
+                },
+              },
+            }),
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              const errorMsg = token
+                ? "GitHub Token无效，请检查token权限或重新生成"
+                : "需要GitHub Token才能创建房间，请在高级选项中配置";
+              throw new Error(errorMsg);
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const gist = await response.json();
+          const gistId = gist.id;
+
+          // 保存到全局房间列表中
+          await addToRoomRegistry(roomId, gistId);
+
+          return gistId;
+        } catch (error) {
+          console.error("创建房间Gist失败:", error);
+          throw error;
+        }
+      }
+
+      // 读取房间Gist的包装函数
+      async function readRoomGist(gistId) {
+        try {
+          const headers = {};
+          const token = getGitHubToken();
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+
+          const response = await fetch(
+            `https://api.github.com/gists/${gistId}`,
+            { headers: headers }
+          );
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              return null;
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const gist = await response.json();
+          const fileName = Object.keys(gist.files)[0];
+          const content = gist.files[fileName].content;
+          return JSON.parse(content);
+        } catch (error) {
+          console.error("读取房间Gist失败:", error);
+          throw error;
+        }
+      }
+
+      // 添加到房间注册表（更新全局注册表Gist）
+      async function addToRoomRegistry(roomId, gistId) {
+        try {
+          const GLOBAL_REGISTRY_GIST_ID = "55e80e797800fb3d2efd87782db79bb5";
+
+          console.log(`📝 将房间 ${roomId} 添加到全局注册表...`);
+
+          // 读取当前注册表
+          let registry;
+          try {
+            registry = await readRoomGist(GLOBAL_REGISTRY_GIST_ID);
+          } catch (error) {
+            console.log("注册表不存在或为空，创建新的注册表");
+            registry = { rooms: {} };
+          }
+
+          if (!registry.rooms) {
+            registry.rooms = {};
+          }
+
+          // 添加新房间
+          registry.rooms[roomId] = {
+            gistId: gistId,
+            created: Date.now(),
+          };
+
+          // 更新注册表Gist（创建新版本，因为无法直接更新）
+          const updatedRegistryGistId = await createRoomGist(
+            "Global Room Registry",
+            { rooms: registry.rooms }
+          );
+
+          console.log(
+            `📝 房间 ${roomId} 已添加到注册表，新注册表ID: ${updatedRegistryGistId}`
+          );
+
+          // 这里有个问题：我们无法让所有人都知道新的注册表ID
+          // 所以这个方案还是有缺陷的...
+        } catch (error) {
+          console.warn("添加到注册表失败:", error);
+        }
+      }
+
+      // 生成房间码
+      function generateRoomId() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+        for (let i = 0; i < 6; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+
+      // 查找房间的Gist ID（从localStorage缓存中查找）
+      function getRoomGistId(roomId) {
+        const roomCache = JSON.parse(localStorage.getItem("roomCache") || "{}");
+        return roomCache[roomId] || null;
+      }
+
+      // 保存房间的Gist ID到缓存
+      function saveRoomGistId(roomId, gistId) {
+        const roomCache = JSON.parse(localStorage.getItem("roomCache") || "{}");
+        roomCache[roomId] = gistId;
+        localStorage.setItem("roomCache", JSON.stringify(roomCache));
+      }
+
+      // 清除特定房间的缓存
+      function clearRoomCache(roomId) {
+        const roomCache = JSON.parse(localStorage.getItem("roomCache") || "{}");
+        delete roomCache[roomId];
+        localStorage.setItem("roomCache", JSON.stringify(roomCache));
+      }
+
       // UI状态管理
       const UIState = {
         INITIAL: "connecting-phase",
@@ -1291,6 +1437,46 @@
       };
 
       let currentUIState = UIState.INITIAL;
+
+      // 页面加载时初始化token和界面
+      function initializeToken() {
+        const savedToken = localStorage.getItem("githubToken");
+
+        if (savedToken && savedToken.length > 10) {
+          // 有有效Token，显示主界面
+          console.log("✅ 找到有效Token，显示主界面");
+          showMainInterface();
+
+          if (elements.githubToken) {
+            elements.githubToken.value = savedToken;
+          }
+          if (elements.githubTokenRequired) {
+            elements.githubTokenRequired.value = savedToken;
+          }
+        } else {
+          // 没有Token，显示Token输入界面
+          console.log("❌ 未找到Token，显示Token输入界面");
+          showTokenRequiredInterface();
+        }
+      }
+
+      // 显示Token必填界面
+      function showTokenRequiredInterface() {
+        elements.tokenRequiredSection.style.display = "block";
+        elements.roomMainSection.style.display = "none";
+
+        setTimeout(() => {
+          if (elements.githubTokenRequired) {
+            elements.githubTokenRequired.focus();
+          }
+        }, 500);
+      }
+
+      // 显示主界面
+      function showMainInterface() {
+        elements.tokenRequiredSection.style.display = "none";
+        elements.roomMainSection.style.display = "block";
+      }
 
       // 切换UI状态
       function setUIState(state) {
@@ -1305,6 +1491,13 @@
             elements.connectionStep.style.display = "none";
             elements.connectionProgress.classList.remove("active");
             elements.status.style.display = "none";
+
+            // 更新标题显示房间信息
+            if (currentRoomId) {
+              elements.chatTitle.textContent = `🏠 房间: ${currentRoomId}`;
+              elements.chatSubtitle.textContent =
+                "🎉 连接成功！与朋友在同一房间聊天";
+            }
             break;
           default:
             // 连接前的UI状态
@@ -1731,74 +1924,6 @@
         }
       }
 
-      // 稳定压缩器 - 暂时只使用可靠的标准压缩
-      function compressSDP(sessionDescription) {
-        try {
-          // 直接使用标准Base64压缩，这是最稳定的方案
-          const jsonString = JSON.stringify(sessionDescription);
-          const base64 = btoa(jsonString)
-            .replace(/\+/g, "-")
-            .replace(/\//g, "_")
-            .replace(/=/g, "");
-
-          // 可选：记录压缩效果
-          const originalSize = jsonString.length;
-          const compressedSize = base64.length + 4; // +4 for "CHAT"
-
-          return "CHAT" + base64;
-        } catch (e) {
-          console.error("标准压缩失败:", e);
-          // 最后的降级方案
-          return JSON.stringify(sessionDescription);
-        }
-      }
-
-      // 稳定解压器 - 只处理标准格式
-      function decompressSDP(compressed) {
-        try {
-          // 处理标准压缩格式：CHAT开头
-          if (compressed.startsWith("CHAT")) {
-            const base64Part = compressed.substring(4);
-            const base64 = base64Part.replace(/-/g, "+").replace(/_/g, "/");
-            const padding = "=".repeat((4 - (base64.length % 4)) % 4);
-            const fullBase64 = base64 + padding;
-
-            const jsonString = atob(fullBase64);
-            const sessionDescription = JSON.parse(jsonString);
-
-            return new RTCSessionDescription(sessionDescription);
-          }
-
-          // 处理原始JSON格式
-          if (compressed.startsWith("{")) {
-            return new RTCSessionDescription(JSON.parse(compressed));
-          }
-
-          // 如果不是已知格式，提示错误
-          throw new Error(
-            `不支持的连接码格式: ${compressed.substring(0, 10)}...`
-          );
-        } catch (e) {
-          console.error("连接码解析失败:", e.message);
-
-          // 友好的错误提示
-          let errorMsg = "连接码解析失败！\n\n";
-          if (compressed.length < 10) {
-            errorMsg += "连接码太短，可能不完整。";
-          } else if (
-            !compressed.startsWith("CHAT") &&
-            !compressed.startsWith("{")
-          ) {
-            errorMsg += "连接码格式不正确，应该以 'CHAT' 开头。";
-          } else {
-            errorMsg += `技术错误: ${e.message}`;
-          }
-
-          alert(errorMsg);
-          return null;
-        }
-      }
-
       // 显示消息
       function addMessage(content, isMe = false) {
         const div = document.createElement("div");
@@ -1894,26 +2019,11 @@
             updateProgress(1, "completed");
             updateProgress(2, "active");
 
-            // 生成连接码
-            const compressed = compressSDP(pc.localDescription);
-            elements.myCode.value = compressed;
-            elements.copy.disabled = false;
+            // 房间模式下不需要生成传统连接码
+            console.log("房间模式：无需生成传统连接码");
 
-            // 自动复制连接码
-            navigator.clipboard
-              .writeText(compressed)
-              .then(() => {
-                showToast("连接码已复制！发给朋友");
-                setStatus("连接码已自动复制！发给朋友", "#28a745");
-                elements.myCode.select();
-                // 显示应答码输入区
-                showWaitAnswerStep();
-              })
-              .catch((e) => {
-                showToast("复制失败，请手动复制", "error");
-                setStatus("连接码已生成，点击复制", "#28a745");
-                showWaitAnswerStep();
-              });
+            // 房间模式下不需要传统连接码逻辑
+            console.log("房间模式：ICE gathering完成");
           }
         };
 
@@ -2104,219 +2214,1422 @@
         }
       }
 
-      // 新的交互函数
-      function startCreate() {
-        showDetails("create");
-        // 直接自动生成连接码
-        setTimeout(() => {
-          elements.generate.click();
-        }, 100);
-      }
+      // ===== 房间连接逻辑 =====
 
-      function startJoin() {
-        showDetails("join");
-      }
+      // 连接到房间
+      async function connectToRoom(roomId) {
+        if (!roomId || roomId.length !== 6) {
+          showToast("请输入6位房间号", "error");
+          return;
+        }
 
-      function showDetails(type) {
-        // 隐藏选择卡片
-        document.querySelector(".action-cards").style.display = "none";
-        document.querySelector(".welcome-prompt").style.display = "none";
+        roomId = roomId.toUpperCase();
+        currentRoomId = roomId;
 
-        // 显示详细操作区域
-        const detailsArea = document.getElementById("detailsArea");
-        detailsArea.style.display = "block";
+        // 显示连接状态
+        elements.roomStatus.style.display = "block";
+        elements.roomStatusText.textContent = "🔄 正在连接房间...";
+        elements.joinRoom.disabled = true;
 
-        if (type === "create") {
-          document.getElementById("createDetails").style.display = "block";
-          document.getElementById("joinDetails").style.display = "none";
-          // 自动聚焦到生成按钮
-          setTimeout(() => {
-            document.getElementById("generate").focus();
-          }, 100);
-        } else {
-          document.getElementById("createDetails").style.display = "none";
-          document.getElementById("joinDetails").style.display = "block";
-          // 自动聚焦到文本框
-          setTimeout(() => {
-            document.getElementById("theirCode").focus();
-          }, 100);
+        try {
+          // 超简单方案：独立的offer和answer Gist
+          console.log(`🔍 检查房间: ${roomId}`);
+
+          // 1. 搜索房间的offer Gist
+          const offerGist = await searchOfferGist(roomId);
+
+          if (offerGist) {
+            // 找到offer，作为answerer创建answer
+            console.log(`✅ 找到房间 ${roomId} 的offer`);
+            elements.roomStatusText.textContent = "✅ 找到offer，生成answer...";
+            await createAnswerAndConnect(roomId, offerGist);
+          } else {
+            // 没有offer，作为offerer创建offer
+            console.log(`🏗️ 房间 ${roomId} 没有offer，创建offer并等待`);
+            elements.roomStatusText.textContent = "🏗️ 创建offer并等待answer...";
+            await createOfferAndWait(roomId);
+          }
+        } catch (error) {
+          console.error("房间连接失败:", error);
+          elements.roomStatusText.textContent = "❌ 连接失败";
+          elements.joinRoom.disabled = false;
+          showToast("房间连接失败: " + error.message, "error");
         }
       }
 
-      // 显示等待应答码的步骤
-      function showWaitAnswerStep() {
-        elements.generateStatus.style.display = "none";
-        elements.answerSection.style.display = "block";
-
-        // 自动聚焦到应答码输入框
-        setTimeout(() => {
-          elements.answerCode.focus();
-        }, 100);
-      }
-
-      function goBack() {
-        // 显示选择卡片
-        document.querySelector(".action-cards").style.display = "flex";
-        document.querySelector(".welcome-prompt").style.display = "block";
-
-        // 隐藏详细操作区域
-        document.getElementById("detailsArea").style.display = "none";
-        document.getElementById("createDetails").style.display = "none";
-        document.getElementById("joinDetails").style.display = "none";
-
-        // 重置创建聊天的步骤显示
-        elements.generateStatus.style.display = "block";
-        elements.answerSection.style.display = "none";
-
-        // 清理状态
-        elements.myCode.value = "";
-        elements.theirCode.value = "";
-        elements.answerCode.value = "";
-        elements.copy.disabled = true;
-        setStatus("", "#666");
-        elements.connectionProgress.classList.remove("active");
-        waiting = false;
-      }
-
-      // 事件绑定
-
-      elements.generate.onclick = async () => {
+      // 搜索offer Gist（通过文件名搜索）
+      async function searchOfferGist(roomId) {
         try {
-          // 开始连接流程，显示进度
-          updateProgress(1, "active");
+          const headers = {};
+          const token = getGitHubToken();
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
 
+          // 正确方法：获取公开Gist列表并筛选
+          console.log(`🔍 查找房间 ${roomId} 的offer Gist`);
+
+          // 添加GitHub API推荐的headers
+          headers["Accept"] = "application/vnd.github+json";
+          headers["X-GitHub-Api-Version"] = "2022-11-28";
+
+          const response = await fetch("https://api.github.com/gists/public", {
+            headers: headers,
+          });
+
+          if (response.ok) {
+            const gists = await response.json();
+            console.log(`📄 获取到 ${gists.length} 个公开Gist`);
+
+            // 筛选包含我们房间offer的Gist
+            for (const gist of gists) {
+              // 检查描述
+              if (
+                gist.description &&
+                gist.description.includes(`Room ${roomId} Offer`)
+              ) {
+                console.log(`✅ 通过描述找到offer Gist: ${gist.id}`);
+                return { id: gist.id };
+              }
+
+              // 检查文件名
+              const files = Object.keys(gist.files);
+              if (files.includes(`offer_${roomId}.json`)) {
+                console.log(`✅ 通过文件名找到offer Gist: ${gist.id}`);
+                return { id: gist.id };
+              }
+            }
+          }
+
+          console.log(`❌ 未找到房间 ${roomId} 的offer`);
+          return null;
+        } catch (error) {
+          console.error("搜索offer失败:", error);
+          return null;
+        }
+      }
+
+      // 创建offer并等待answer
+      async function createOfferAndWait(roomId) {
+        try {
+          // 1. 创建WebRTC offer
+          updateProgress(1, "active");
           pc = createConnection();
           channel = pc.createDataChannel("chat");
           setupChannel();
 
           const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
-          waiting = true;
-          elements.myCode.value = "生成中...";
-        } catch (error) {
-          console.error("生成连接码失败:", error);
-          setStatus("生成失败，请重试", "#dc3545");
-          elements.connectionProgress.classList.remove("active");
-          alert("生成连接码失败，请重试");
-        }
-      };
 
-      elements.copy.onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(elements.myCode.value);
-          showToast("已复制到剪贴板！");
-          elements.copy.textContent = "已复制!";
-          setTimeout(
-            () => (elements.copy.textContent = "📋 复制发给朋友"),
-            2000
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) resolve();
+            };
+          });
+
+          const offerTimestamp = Date.now();
+
+          // 2. 创建offer数据
+          const offerData = {
+            roomId: roomId,
+            offer: pc.localDescription,
+            timestamp: offerTimestamp,
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          // 3. 创建offer Gist
+          const offerGistId = await createRoomGist(
+            `Room ${roomId} Offer`,
+            offerData,
+            `offer_${roomId}.json`
           );
-        } catch (e) {
-          elements.myCode.select();
-          document.execCommand("copy");
-          showToast("已复制到剪贴板！");
-        }
-      };
 
-      elements.connect.onclick = async () => {
-        const code = elements.theirCode.value.trim();
-        if (!code) {
-          alert("请先粘贴朋友的连接码");
-          return;
-        }
+          console.log(`✅ Offer已创建: ${offerGistId}`);
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
 
+          // 4. 开始轮询搜索answer
+          pollForAnswer(roomId, offerTimestamp);
+        } catch (error) {
+          console.error("创建offer失败:", error);
+          throw error;
+        }
+      }
+
+      // 创建answer并连接
+      async function createAnswerAndConnect(roomId, offerGist) {
         try {
-          // 解析连接码
-          const desc = code.startsWith("{")
-            ? new RTCSessionDescription(JSON.parse(code))
-            : decompressSDP(code);
+          // 1. 读取offer数据
+          const offerData = await readRoomGist(offerGist.id);
+          console.log("Offer数据:", offerData);
 
-          if (!desc) {
-            alert("连接码格式错误，请检查后重试");
-            return;
-          }
+          // 2. 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
 
-          if (desc.type === "offer") {
-            // 开始连接流程
-            updateProgress(1, "active");
+          await pc.setRemoteDescription(
+            new RTCSessionDescription(offerData.offer)
+          );
+          updateProgress(2, "active");
 
-            pc = createConnection();
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
 
-            // 步骤1: 解析连接信息
-            updateProgress(1, "completed");
-            updateProgress(2, "active");
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) resolve();
+            };
+          });
 
-            await pc.setRemoteDescription(desc);
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
+          // 3. 创建answer数据
+          const answerData = {
+            roomId: roomId,
+            answer: pc.localDescription,
+            offerTimestamp: offerData.timestamp,
+            timestamp: Date.now(),
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
 
-            // 步骤2: 生成应答完成
-            updateProgress(2, "completed");
-            updateProgress(3, "active");
+          // 4. 创建answer Gist
+          const answerGistId = await createRoomGist(
+            `Room ${roomId} Answer`,
+            answerData,
+            `answer_${roomId}.json`
+          );
 
-            // 自动生成应答码并显示给用户
-            const answerCode = compressSDP(pc.localDescription);
-            elements.myCode.value = answerCode;
-            elements.copy.disabled = false;
-
-            // 自动复制应答码
-            navigator.clipboard
-              .writeText(answerCode)
-              .then(() => {
-                showToast("应答码已复制！发给朋友");
-                setStatus("应答码已复制！发给朋友", "#28a745");
-              })
-              .catch((e) => {
-                showToast("复制失败，请手动复制", "error");
-                setStatus("应答码已生成，请复制", "#28a745");
-              });
-          } else if (desc.type === "answer" && waiting) {
-            // 接收应答，完成连接
-            updateProgress(3, "active");
-
-            await pc.setRemoteDescription(desc);
-            waiting = false;
-          }
-        } catch (e) {
-          console.error("连接失败:", e);
-          setStatus("连接失败，请重试", "#dc3545");
-          elements.connectionProgress.classList.remove("active");
-          alert("连接失败，请检查连接码");
+          console.log(`✅ Answer已创建: ${answerGistId}`);
+          updateProgress(3, "active");
+          elements.roomStatusText.textContent = "🤝 正在建立连接...";
+        } catch (error) {
+          console.error("创建answer失败:", error);
+          throw error;
         }
-      };
+      }
 
-      // 应答码连接按钮事件
-      elements.connectAnswer.onclick = async () => {
-        const answerCode = elements.answerCode.value.trim();
-        if (!answerCode) {
-          alert("请粘贴朋友发来的应答码");
-          return;
-        }
+      // 轮询搜索answer
+      function pollForAnswer(roomId, offerTimestamp) {
+        let pollCount = 0;
+        const maxPolls = 100;
 
+        const pollInterval = setInterval(async () => {
+          try {
+            pollCount++;
+            elements.roomStatusText.textContent = `⏳ 等待answer... (${Math.ceil(
+              pollCount / 20
+            )}分钟)`;
+
+            // 搜索answer Gist
+            const answerGist = await searchAnswerGist(roomId);
+
+            if (answerGist) {
+              clearInterval(pollInterval);
+
+              // 读取answer数据
+              const answerData = await readRoomGist(answerGist.id);
+
+              if (answerData && answerData.offerTimestamp === offerTimestamp) {
+                await pc.setRemoteDescription(
+                  new RTCSessionDescription(answerData.answer)
+                );
+                updateProgress(3, "active");
+                elements.roomStatusText.textContent = "🤝 正在建立连接...";
+              }
+            }
+
+            if (pollCount >= maxPolls) {
+              clearInterval(pollInterval);
+              elements.roomStatusText.textContent = "⏰ 等待超时，请重试";
+              elements.joinRoom.disabled = false;
+            }
+          } catch (error) {
+            console.error("轮询answer失败:", error);
+          }
+        }, 3000);
+      }
+
+      // 搜索answer Gist
+      async function searchAnswerGist(roomId) {
         try {
-          // 解析应答码
-          const desc = answerCode.startsWith("{")
-            ? new RTCSessionDescription(JSON.parse(answerCode))
-            : decompressSDP(answerCode);
-
-          if (!desc) {
-            alert("应答码格式错误，请检查后重试");
-            return;
+          const headers = {};
+          const token = getGitHubToken();
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
           }
 
-          if (desc.type === "answer" && waiting) {
-            // 接收应答，完成连接
-            updateProgress(3, "active");
+          // 正确方法：获取公开Gist列表并筛选
+          console.log(`🔍 查找房间 ${roomId} 的answer Gist`);
 
-            await pc.setRemoteDescription(desc);
-            waiting = false;
+          // 添加GitHub API推荐的headers
+          headers["Accept"] = "application/vnd.github+json";
+          headers["X-GitHub-Api-Version"] = "2022-11-28";
+
+          const response = await fetch("https://api.github.com/gists/public", {
+            headers: headers,
+          });
+
+          if (response.ok) {
+            const gists = await response.json();
+            console.log(`📄 检查 ${gists.length} 个公开Gist寻找answer`);
+
+            // 筛选包含我们房间answer的Gist
+            for (const gist of gists) {
+              // 检查描述
+              if (
+                gist.description &&
+                gist.description.includes(`Room ${roomId} Answer`)
+              ) {
+                console.log(`✅ 通过描述找到answer Gist: ${gist.id}`);
+                return { id: gist.id };
+              }
+
+              // 检查文件名
+              const files = Object.keys(gist.files);
+              if (files.includes(`answer_${roomId}.json`)) {
+                console.log(`✅ 通过文件名找到answer Gist: ${gist.id}`);
+                return { id: gist.id };
+              }
+            }
+          }
+
+          console.log(`❌ 未找到房间 ${roomId} 的answer`);
+          return null;
+        } catch (error) {
+          console.error("搜索answer失败:", error);
+          return null;
+        }
+      }
+
+      // 修改createRoomGist支持自定义文件名
+      async function createRoomGist(description, data, fileName = "data.json") {
+        try {
+          const headers = {
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "Content-Type": "application/json",
+          };
+
+          const token = getGitHubToken();
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+
+          const response = await fetch("https://api.github.com/gists", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+              description: description,
+              public: true, // 公开便于搜索
+              files: {
+                [fileName]: {
+                  content: JSON.stringify(data),
+                },
+              },
+            }),
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              const errorMsg = token
+                ? "GitHub Token无效，请检查token权限或重新生成"
+                : "需要GitHub Token才能创建房间，请在高级选项中配置";
+              throw new Error(errorMsg);
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const gist = await response.json();
+          return gist.id;
+        } catch (error) {
+          console.error("创建Gist失败:", error);
+
+          if (error.message.includes("需要GitHub Token")) {
+            const details = document.querySelector("#tokenSection details");
+            if (details && !details.open) {
+              details.open = true;
+              showToast("请配置GitHub Token后重试", "error");
+            }
+          }
+
+          throw error;
+        }
+      }
+
+      // 查找房间的offer Gist
+      async function findOfferGist(roomId) {
+        try {
+          // 约定：offer的Gist描述为 "Room ABC123 Offer"
+          // 尝试几个可能的offer Gist ID（基于您的账号创建的）
+          const possibleOfferGists = [
+            "55e80e797800fb3d2efd87782db79bb5", // 您创建的那个
+            // 可以添加更多备用的
+          ];
+
+          for (const gistId of possibleOfferGists) {
+            try {
+              console.log(`🔍 检查offer Gist: ${gistId}`);
+              const gistData = await readRoomGist(gistId);
+
+              // 检查是否包含我们房间的offer
+              if (
+                gistData &&
+                gistData.roomId === roomId &&
+                gistData.offers &&
+                gistData.offers.length > 0
+              ) {
+                console.log(`✅ 找到房间 ${roomId} 的offer`);
+                return gistId;
+              }
+            } catch (error) {
+              console.warn(`Gist ${gistId} 读取失败:`, error);
+            }
+          }
+
+          console.log(`❌ 未找到房间 ${roomId} 的offer`);
+          return null;
+        } catch (error) {
+          console.error("查找offer失败:", error);
+          return null;
+        }
+      }
+
+      // 作为offerer创建房间
+      async function createAsOfferer(roomId) {
+        try {
+          // 创建WebRTC offer
+          updateProgress(1, "active");
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) resolve();
+            };
+          });
+
+          const offerTimestamp = Date.now();
+
+          // 创建房间数据（仍然使用您的固定Gist）
+          const roomData = {
+            roomId: roomId,
+            offers: [
+              {
+                offer: pc.localDescription,
+                timestamp: offerTimestamp,
+                userId: "user_" + Math.random().toString(36).substr(2, 9),
+              },
+            ],
+            answers: [],
+            created: Date.now(),
+          };
+
+          // 但是不能真正更新，只能创建新版本...
+          console.log("⚠️ 当前限制：无法更新Gist，数据只能存在内存中");
+
+          roomGistId = "55e80e797800fb3d2efd87782db79bb5"; // 使用固定ID
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 简化的轮询：只检查固定Gist
+          pollForAnswerSimple(roomId, offerTimestamp);
+        } catch (error) {
+          console.error("创建offerer失败:", error);
+          throw error;
+        }
+      }
+
+      // 作为answerer加入
+      async function joinAsAnswerer(roomId, offerGistId) {
+        try {
+          // 读取offer数据
+          const roomData = await readRoomGist(offerGistId);
+          const offer = roomData.offers[0]; // 使用第一个可用的offer
+
+          console.log("🔗 连接到offer:", offer);
+
+          // 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
+
+          await pc.setRemoteDescription(new RTCSessionDescription(offer.offer));
+
+          updateProgress(2, "active");
+
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) resolve();
+            };
+          });
+
+          console.log("✅ Answer生成完成，但无法保存到共享Gist");
+          console.log("⚠️ 当前限制：无法更新Gist保存answer");
+
+          updateProgress(3, "active");
+          elements.roomStatusText.textContent = "🤝 正在建立连接...";
+        } catch (error) {
+          console.error("作为answerer加入失败:", error);
+          throw error;
+        }
+      }
+
+      // 简化的轮询
+      function pollForAnswerSimple(roomId, offerTimestamp) {
+        console.log("⚠️ 轮询功能受限：无法真正检查answer");
+        // 当前实现下，answer无法被保存，所以轮询无意义
+      }
+
+      // 超简单方案：固定Gist ID + 直接读取
+      async function tryReadRoomGist(roomId) {
+        try {
+          // 关键：所有人都使用同一个固定的Gist ID
+          const SHARED_GIST_ID = "55e80e797800fb3d2efd87782db79bb5";
+
+          console.log(`📖 读取固定共享Gist: ${SHARED_GIST_ID}`);
+
+          try {
+            const sharedData = await readRoomGist(SHARED_GIST_ID);
+            console.log("共享Gist内容:", sharedData);
+
+            // 检查这个共享空间是否有我们房间的数据
+            if (sharedData && sharedData[roomId]) {
+              console.log(`✅ 在共享Gist中找到房间 ${roomId}`);
+              return SHARED_GIST_ID; // 返回固定的ID
+            } else {
+              console.log(`❌ 共享Gist中没有房间 ${roomId}`);
+              return null;
+            }
+          } catch (error) {
+            console.error("读取共享Gist失败:", error);
+            return null;
+          }
+        } catch (error) {
+          console.error("尝试读取房间失败:", error);
+          return null;
+        }
+      }
+
+      // 创建第一个用户的房间
+      async function createFirstUserRoom(roomId) {
+        try {
+          // 1. 创建WebRTC offer
+          updateProgress(1, "active");
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          const offerTimestamp = Date.now();
+
+          // 2. 创建房间数据结构
+          const roomData = {
+            offer: pc.localDescription,
+            offerTimestamp: offerTimestamp,
+            answer: null,
+            created: Date.now(),
+          };
+
+          // 3. 更新固定的共享Gist
+          const SHARED_GIST_ID = "55e80e797800fb3d2efd87782db79bb5";
+
+          // 读取当前共享Gist数据
+          let sharedData = {};
+          try {
+            sharedData = (await readRoomGist(SHARED_GIST_ID)) || {};
+          } catch (error) {
+            console.log("共享Gist为空，初始化新数据");
+          }
+
+          // 添加房间数据
+          sharedData[roomId] = roomData;
+
+          // ⚠️ 问题：我们无法直接更新现有的Gist（需要创建新版本）
+          // 但新版本会有新的ID，其他用户就找不到了！
+
+          console.log(`💾 需要更新共享Gist，但会产生新ID...`);
+          console.log("当前方案的限制：无法真正更新Gist，只能创建新版本");
+
+          // 临时方案：将房间数据存储到您的固定Gist中
+          // 但这需要您的GitHub账号权限才能更新
+
+          roomGistId = SHARED_GIST_ID; // 使用固定ID
+
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 开始轮询等待answer
+          pollForAnswerInSharedGist(roomId, offerTimestamp);
+        } catch (error) {
+          console.error("创建第一个用户房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 加入现有房间
+      async function joinExistingRoom(roomData) {
+        try {
+          if (!roomData || !roomData.offer) {
+            throw new Error("房间数据无效，没有找到offer");
+          }
+
+          if (roomData.answer) {
+            throw new Error("房间已满，已有其他用户连接");
+          }
+
+          console.log("🔗 连接到房间的offer");
+
+          // 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
+
+          // 设置远程offer
+          await pc.setRemoteDescription(
+            new RTCSessionDescription(roomData.offer)
+          );
+
+          updateProgress(2, "active");
+
+          // 创建answer
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          // 更新房间数据，添加answer
+          roomData.answer = pc.localDescription;
+          roomData.answerTimestamp = Date.now();
+
+          // 更新共享Gist
+          const SHARED_GIST_ID = "55e80e797800fb3d2efd87782db79bb5";
+          let sharedData = await readRoomGist(SHARED_GIST_ID);
+          sharedData[currentRoomId] = roomData;
+
+          const newGistId = await createRoomGist(
+            `Shared Chat Rooms`,
+            sharedData
+          );
+          console.log(`✅ Answer已添加到共享Gist: ${newGistId}`);
+
+          // 更新Gist ID
+          localStorage.setItem(`room_${currentRoomId}_gist_id`, newGistId);
+          roomGistId = newGistId;
+
+          updateProgress(3, "active");
+          elements.roomStatusText.textContent = "🤝 正在建立连接...";
+        } catch (error) {
+          console.error("加入现有房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 在共享Gist中轮询answer
+      function pollForAnswerInSharedGist(roomId, offerTimestamp) {
+        let pollCount = 0;
+        const maxPolls = 100;
+
+        const pollInterval = setInterval(async () => {
+          try {
+            pollCount++;
+            elements.roomStatusText.textContent = `⏳ 等待其他人加入... (${Math.ceil(
+              pollCount / 20
+            )}分钟)`;
+
+            // 读取最新的共享Gist ID
+            const currentGistId = localStorage.getItem(
+              `room_${roomId}_gist_id`
+            );
+            if (currentGistId) {
+              const sharedData = await readRoomGist(currentGistId);
+
+              if (
+                sharedData &&
+                sharedData[roomId] &&
+                sharedData[roomId].answer
+              ) {
+                clearInterval(pollInterval);
+
+                const answer = sharedData[roomId].answer;
+                await pc.setRemoteDescription(
+                  new RTCSessionDescription(answer)
+                );
+
+                updateProgress(3, "active");
+                elements.roomStatusText.textContent = "🤝 正在建立连接...";
+                return;
+              }
+            }
+
+            if (pollCount >= maxPolls) {
+              clearInterval(pollInterval);
+              elements.roomStatusText.textContent = "⏰ 等待超时，请重试";
+              elements.joinRoom.disabled = false;
+            }
+          } catch (error) {
+            console.error("轮询共享Gist失败:", error);
+          }
+        }, 3000);
+      }
+
+      // 基于房间号生成固定的Gist ID
+      function generateRoomGistId(roomId) {
+        // 使用一个固定的算法将房间号转换为32位的hex字符串
+        // 这只是示例，实际使用时我们需要一个真实的哈希算法
+
+        // 简单的字符串哈希
+        let hash = 0;
+        const str = roomId + "CHAT_ROOM_SALT_2025";
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = (hash << 5) - hash + char;
+          hash = hash & hash; // 转换为32位整数
+        }
+
+        // 转换为正数并格式化为32位hex字符串
+        const positiveHash = Math.abs(hash);
+        let hexId = positiveHash.toString(16).padStart(8, "0");
+
+        // 确保是32位hex格式（模拟GitHub Gist ID格式）
+        while (hexId.length < 32) {
+          hexId = hexId + hexId;
+        }
+        hexId = hexId.substring(0, 32);
+
+        return hexId;
+      }
+
+      // 创建新房间
+      async function createNewRoom(roomId) {
+        try {
+          elements.roomStatusText.textContent = "🎯 创建房间并生成连接信息...";
+
+          // 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          const offerTimestamp = Date.now();
+          const offerData = {
+            type: "offer",
+            offer: pc.localDescription,
+            timestamp: offerTimestamp,
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          // 创建房间数据
+          const roomData = {
+            roomId: roomId,
+            offers: [offerData],
+            answers: [],
+            created: Date.now(),
+          };
+
+          // 保存房间数据
+          const resourceId = await saveRoomData(roomId, roomData);
+          roomGistId = `room_${roomId}`; // 使用模拟的ID
+
+          console.log(`🎯 房间 ${roomId} 创建成功, 资源ID: ${resourceId}`);
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 开始轮询等待answer
+          pollForAnswer(offerTimestamp);
+        } catch (error) {
+          console.error("创建新房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 加入房间
+      async function joinRoom(roomData) {
+        try {
+          if (!roomData || !roomData.offers) {
+            throw new Error("房间数据无效");
+          }
+
+          console.log(
+            `📊 分析房间数据: offers=${roomData.offers.length}, answers=${
+              roomData.answers ? roomData.answers.length : 0
+            }`
+          );
+
+          // 查找可用的offer（没有对应answer的）
+          let availableOffer = null;
+
+          for (const offer of roomData.offers) {
+            const hasAnswer =
+              roomData.answers &&
+              roomData.answers.some(
+                (answer) => answer.offerTimestamp === offer.timestamp
+              );
+            console.log(
+              `🔍 检查Offer ${offer.timestamp}: ${
+                hasAnswer ? "已有answer" : "可用"
+              }`
+            );
+            if (!hasAnswer) {
+              availableOffer = offer;
+              break;
+            }
+          }
+
+          if (availableOffer) {
+            // 找到可用offer，作为answerer连接
+            console.log(
+              `🔗 找到可用offer，作为answerer连接: ${availableOffer.timestamp}`
+            );
+            elements.roomStatusText.textContent =
+              "🔗 找到等待中的用户，正在连接...";
+            await connectAsAnswerer(availableOffer);
           } else {
-            alert("应答码无效或连接状态错误");
+            // 没有可用offer，作为新的offerer
+            console.log("💫 没有可用offer，作为新的offerer");
+            elements.roomStatusText.textContent = "💫 添加新连接...";
+            await addOfferToRoom(roomData);
           }
-        } catch (e) {
-          console.error("处理应答码失败:", e);
-          setStatus("应答码处理失败，请重试", "#dc3545");
-          alert("应答码格式错误，请检查后重试");
+        } catch (error) {
+          console.error("加入房间失败:", error);
+          throw error;
         }
+      }
+
+      // 作为answerer连接
+      async function connectAsAnswerer(offer) {
+        try {
+          updateProgress(1, "active");
+
+          // 创建WebRTC连接
+          pc = createConnection();
+
+          // 设置远程offer
+          await pc.setRemoteDescription(new RTCSessionDescription(offer.offer));
+
+          updateProgress(2, "active");
+
+          // 创建answer
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          // 准备answer数据
+          const answerData = {
+            type: "answer",
+            answer: pc.localDescription,
+            offerTimestamp: offer.timestamp,
+            timestamp: Date.now(),
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          // 更新房间数据：添加answer
+          await addAnswerToRoom(answerData);
+
+          updateProgress(3, "active");
+          elements.roomStatusText.textContent = "🤝 正在建立连接...";
+        } catch (error) {
+          console.error("作为answerer连接失败:", error);
+          throw error;
+        }
+      }
+
+      // 添加offer到房间
+      async function addOfferToRoom(roomData) {
+        try {
+          // 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          const offerTimestamp = Date.now();
+          const offerData = {
+            type: "offer",
+            offer: pc.localDescription,
+            timestamp: offerTimestamp,
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          // 更新房间数据
+          roomData.offers.push(offerData);
+
+          // 保存更新的房间数据
+          await saveRoomData(currentRoomId, roomData);
+          console.log(`✅ Offer已添加到房间 ${currentRoomId}`);
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 开始轮询等待answer
+          pollForAnswer(offerTimestamp);
+        } catch (error) {
+          console.error("添加offer到房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 添加answer到房间
+      async function addAnswerToRoom(answerData) {
+        try {
+          // 读取当前房间数据
+          const roomData = await loadRoomData(currentRoomId);
+
+          // 添加answer
+          if (!roomData.answers) roomData.answers = [];
+          roomData.answers.push(answerData);
+
+          // 保存更新的房间数据
+          await saveRoomData(currentRoomId, roomData);
+          console.log(`✅ Answer已添加到房间 ${currentRoomId}`);
+        } catch (error) {
+          console.error("添加answer到房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 作为第一个用户创建房间
+      async function createRoomAsFirstUser(roomId) {
+        try {
+          elements.roomStatusText.textContent = "🎯 生成连接信息...";
+
+          // 创建WebRTC连接
+          updateProgress(1, "active");
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          // 记录offer时间戳
+          const offerTimestamp = Date.now();
+
+          // 创建offer数据
+          const offerData = {
+            type: "offer",
+            offer: pc.localDescription,
+            timestamp: offerTimestamp,
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          // 上传offer
+          await uploadOfferToRoom(offerData);
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 开始轮询等待answer
+          pollForAnswer(offerTimestamp);
+        } catch (error) {
+          console.error("创建房间失败:", error);
+          throw error;
+        }
+      }
+
+      // 加入现有offers
+      async function joinExistingOffers(offers) {
+        try {
+          elements.roomStatusText.textContent = "🔍 分析可用连接...";
+
+          // 找到没有answer的offer
+          let availableOffer = null;
+
+          for (const offer of offers) {
+            const hasAnswer = await checkIfOfferHasAnswer(
+              currentRoomId,
+              offer.offerTimestamp
+            );
+            if (!hasAnswer) {
+              availableOffer = offer;
+              break;
+            }
+          }
+
+          if (availableOffer) {
+            // 找到可用的offer，连接到它
+            elements.roomStatusText.textContent =
+              "🔗 找到等待中的用户，正在连接...";
+            await connectToFoundOffer(availableOffer);
+          } else {
+            // 所有offer都有answer了，作为新用户创建offer
+            elements.roomStatusText.textContent = "💫 创建新连接...";
+            await createRoomAsFirstUser(currentRoomId);
+          }
+        } catch (error) {
+          console.error("加入现有offers失败:", error);
+          throw error;
+        }
+      }
+
+      // 创建房间offer
+      async function createRoomOffer() {
+        try {
+          updateProgress(1, "active");
+
+          // 创建WebRTC连接
+          pc = createConnection();
+          channel = pc.createDataChannel("chat");
+          setupChannel();
+
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          // 记录offer时间戳
+          const offerTimestamp = Date.now();
+
+          // 上传offer到房间
+          const offerData = {
+            type: "offer",
+            offer: pc.localDescription,
+            timestamp: offerTimestamp,
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          await uploadOfferToRoom(offerData);
+          elements.roomStatusText.textContent = "⏳ 等待其他人加入...";
+
+          // 开始轮询等待answer（传入offer时间戳）
+          pollForAnswer(offerTimestamp);
+        } catch (error) {
+          console.error("创建offer失败:", error);
+          throw error;
+        }
+      }
+
+      // 智能加入房间（混合策略）
+      async function smartJoinRoom(roomData) {
+        try {
+          elements.roomStatusText.textContent = "🔍 分析房间状态...";
+
+          // 策略1：首先检查房间主Gist中的offers（更可靠）
+          let availableOffers = [];
+          if (roomData && roomData.offers && roomData.offers.length > 0) {
+            // 检查房间中的offers是否有可用的
+            for (const offer of roomData.offers) {
+              const hasAnswer =
+                roomData.answers &&
+                roomData.answers.some(
+                  (answer) => answer.offerTimestamp === offer.timestamp
+                );
+              if (!hasAnswer) {
+                availableOffers.push({
+                  gistId: null, // 来自主房间
+                  offerTimestamp: offer.timestamp,
+                  offer: offer,
+                });
+              }
+            }
+          }
+
+          // 策略2：如果主Gist中没有可用offers，尝试搜索独立的offer gists
+          if (availableOffers.length === 0) {
+            elements.roomStatusText.textContent = "🔍 搜索独立连接...";
+            const searchOffers = await searchRoomOffers(currentRoomId);
+
+            for (const offer of searchOffers) {
+              const hasAnswer = await checkIfOfferHasAnswer(
+                currentRoomId,
+                offer.offerTimestamp
+              );
+              if (!hasAnswer) {
+                availableOffers.push(offer);
+              }
+            }
+          }
+
+          if (availableOffers.length === 0) {
+            // 没有找到任何可用offer，作为新用户创建
+            elements.roomStatusText.textContent = "🎯 创建新连接...";
+            await createRoomOffer();
+            return;
+          }
+
+          // 找到可用的offer，连接到最新的一个
+          const latestOffer = availableOffers[0]; // 已经按时间排序
+          elements.roomStatusText.textContent =
+            "🔗 找到等待中的用户，正在连接...";
+          await connectToFoundOffer(latestOffer);
+        } catch (error) {
+          console.error("智能加入房间失败:", error);
+          // 降级：直接创建新的offer
+          elements.roomStatusText.textContent = "🔄 尝试创建新连接...";
+          await createRoomOffer();
+        }
+      }
+
+      // 检查offer是否已有answer（简化版）
+      async function checkIfOfferHasAnswer(roomId, offerTimestamp) {
+        try {
+          const answerGist = await searchAnswerGist(roomId);
+          if (answerGist) {
+            // 读取answer数据检查时间戳匹配
+            const answerData = await readRoomGist(answerGist.id);
+            return answerData && answerData.offerTimestamp === offerTimestamp;
+          }
+          return false;
+        } catch (error) {
+          console.error("检查answer失败:", error);
+          return false;
+        }
+      }
+
+      // 连接到找到的offer
+      async function connectToFoundOffer(offerInfo) {
+        try {
+          updateProgress(1, "active");
+
+          // 创建WebRTC连接
+          pc = createConnection();
+
+          // 设置远程offer
+          await pc.setRemoteDescription(
+            new RTCSessionDescription(offerInfo.offer.offer)
+          );
+
+          updateProgress(2, "active");
+
+          // 创建answer
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          // 等待ICE gathering完成
+          await new Promise((resolve) => {
+            pc.onicecandidate = (e) => {
+              if (!e.candidate) {
+                resolve();
+              }
+            };
+          });
+
+          // 上传answer到房间
+          const answerData = {
+            type: "answer",
+            answer: pc.localDescription,
+            offerTimestamp: offerInfo.offerTimestamp,
+            timestamp: Date.now(),
+            userId: "user_" + Math.random().toString(36).substr(2, 9),
+          };
+
+          await uploadAnswerToRoom(answerData);
+
+          updateProgress(3, "active");
+          elements.roomStatusText.textContent = "🤝 正在建立连接...";
+        } catch (error) {
+          console.error("连接到找到的offer失败:", error);
+          throw error;
+        }
+      }
+
+      // 上传offer到房间（修复版本）
+      async function uploadOfferToRoom(offerData) {
+        try {
+          // 使用offer的时间戳确保一致性
+          const offerTimestamp = offerData.timestamp;
+          const offerGistData = {
+            roomId: currentRoomId,
+            type: "room_offer",
+            offer: offerData,
+            timestamp: offerTimestamp,
+          };
+
+          const offerGistId = await createGist(
+            `Chat Room: ${currentRoomId} - Offer ${offerTimestamp}`,
+            `offer_${currentRoomId}_${offerTimestamp}.json`,
+            offerGistData
+          );
+
+          // 保存offer的Gist ID，用于后续检查
+          const offerCache = JSON.parse(
+            localStorage.getItem("offerCache") || "{}"
+          );
+          if (!offerCache[currentRoomId]) {
+            offerCache[currentRoomId] = [];
+          }
+          offerCache[currentRoomId].push({
+            gistId: offerGistId,
+            timestamp: offerTimestamp,
+            offerTimestamp: offerTimestamp,
+          });
+          localStorage.setItem("offerCache", JSON.stringify(offerCache));
+
+          console.log(`Offer uploaded to Gist: ${offerGistId}`);
+
+          // 同时保存到房间的主Gist中（作为备份）
+          await updateRoomWithOffer(offerData);
+        } catch (error) {
+          console.error("上传offer失败:", error);
+          throw error;
+        }
+      }
+
+      // 更新房间主Gist（添加offer作为备份）
+      async function updateRoomWithOffer(offerData) {
+        try {
+          if (!roomGistId) return;
+
+          // 读取当前房间数据
+          const roomData = await readGist(roomGistId);
+          if (roomData) {
+            // 添加offer到房间数据中
+            if (!roomData.offers) roomData.offers = [];
+            roomData.offers.push(offerData);
+
+            // 创建新的房间Gist
+            const newRoomGistId = await createGist(
+              `Chat Room: ${currentRoomId} - Updated`,
+              `room_${currentRoomId}.json`,
+              roomData
+            );
+
+            // 更新缓存
+            saveRoomGistId(currentRoomId, newRoomGistId);
+            roomGistId = newRoomGistId;
+          }
+        } catch (error) {
+          console.warn("更新房间主Gist失败:", error);
+          // 不抛出错误，因为这只是备份
+        }
+      }
+
+      // 上传answer到房间（优化版本）
+      async function uploadAnswerToRoom(answerData) {
+        try {
+          // 创建包含answer的独立Gist
+          const timestamp = Date.now();
+          const answerGistData = {
+            roomId: currentRoomId,
+            type: "room_answer",
+            answer: answerData,
+            timestamp: timestamp,
+          };
+
+          const answerGistId = await createGist(
+            `Chat Room: ${currentRoomId} - Answer ${timestamp}`,
+            `answer_${currentRoomId}_${answerData.offerTimestamp}.json`,
+            answerGistData
+          );
+
+          console.log(`Answer uploaded to Gist: ${answerGistId}`);
+
+          // 同时保存到房间的主Gist中（作为备份）
+          await updateRoomWithAnswer(answerData);
+        } catch (error) {
+          console.error("上传answer失败:", error);
+          throw error;
+        }
+      }
+
+      // 更新房间主Gist（添加answer作为备份）
+      async function updateRoomWithAnswer(answerData) {
+        try {
+          if (!roomGistId) return;
+
+          // 读取当前房间数据
+          const roomData = await readGist(roomGistId);
+          if (roomData) {
+            // 添加answer到房间数据中
+            if (!roomData.answers) roomData.answers = [];
+            roomData.answers.push(answerData);
+
+            // 创建新的房间Gist
+            const newRoomGistId = await createGist(
+              `Chat Room: ${currentRoomId} - Complete`,
+              `room_${currentRoomId}.json`,
+              roomData
+            );
+
+            // 更新缓存
+            saveRoomGistId(currentRoomId, newRoomGistId);
+            roomGistId = newRoomGistId;
+          }
+        } catch (error) {
+          console.warn("更新房间主Gist失败:", error);
+          // 不抛出错误，因为这只是备份
+        }
+      }
+
+      // 轮询等待answer（纯Gist方案）
+      function pollForAnswer(roomId, myOfferTimestamp) {
+        let pollCount = 0;
+        const maxPolls = 100; // 最多轮询100次 (5分钟)
+
+        const pollInterval = setInterval(async () => {
+          try {
+            pollCount++;
+            elements.roomStatusText.textContent = `⏳ 等待answer... (${Math.ceil(
+              pollCount / 20
+            )}分钟)`;
+
+            // 搜索answer Gist
+            const answerGist = await searchAnswerGist(roomId);
+
+            if (answerGist) {
+              clearInterval(pollInterval);
+
+              // 读取answer数据
+              const answerData = await readRoomGist(answerGist.id);
+              console.log("找到answer数据:", answerData);
+
+              if (
+                answerData &&
+                answerData.offerTimestamp === myOfferTimestamp
+              ) {
+                // 设置远程answer
+                await pc.setRemoteDescription(
+                  new RTCSessionDescription(answerData.answer)
+                );
+
+                updateProgress(3, "active");
+                elements.roomStatusText.textContent = "🤝 正在建立连接...";
+                return;
+              }
+            }
+
+            if (pollCount >= maxPolls) {
+              clearInterval(pollInterval);
+              elements.roomStatusText.textContent = "⏰ 等待超时，请重试";
+              elements.joinRoom.disabled = false;
+            }
+          } catch (error) {
+            console.error("轮询answer失败:", error);
+            // 继续轮询，不中断
+          }
+        }, 3000); // 每3秒轮询一次
+      }
+
+      // 事件绑定
+
+      // Token保存事件
+      elements.saveToken.onclick = () => {
+        const token = elements.githubTokenRequired.value.trim();
+        if (token && token.length > 10) {
+          localStorage.setItem("githubToken", token);
+          showToast("Token已保存！");
+          showMainInterface();
+        } else {
+          showToast("请输入有效的GitHub Token", "error");
+        }
+      };
+
+      // Token输入框回车事件
+      elements.githubTokenRequired.onkeypress = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          elements.saveToken.click();
+        }
+      };
+
+      // 创建房间按钮事件
+      elements.createRoomBtn.onclick = async () => {
+        const newRoomId = generateRoomId();
+        showToast(`房间号已生成: ${newRoomId}`);
+
+        // 自动复制房间号
+        try {
+          await navigator.clipboard.writeText(newRoomId);
+          showToast(`房间号 ${newRoomId} 已复制到剪贴板！`);
+        } catch (error) {
+          console.warn("自动复制失败:", error);
+        }
+
+        // 自动连接到房间
+        currentRoomId = newRoomId;
+        elements.roomStatus.style.display = "block";
+        elements.roomStatusText.textContent = "🎯 创建房间中...";
+
+        await createOfferAndWait(newRoomId);
+      };
+
+      // 加入房间按钮事件
+      elements.joinRoomBtn.onclick = () => {
+        elements.joinRoomSection.style.display = "block";
+        setTimeout(() => {
+          elements.roomIdInput.focus();
+        }, 100);
+      };
+
+      // 加入房间确认事件
+      elements.joinRoom.onclick = async () => {
+        const roomId = elements.roomIdInput.value.trim();
+        await connectToRoom(roomId);
+      };
+
+      // 房间号输入框回车事件
+      elements.roomIdInput.onkeypress = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          elements.joinRoom.click();
+        }
+      };
+
+      // 房间号输入框自动格式化
+      elements.roomIdInput.oninput = (e) => {
+        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (value.length > 6) value = value.substring(0, 6);
+        e.target.value = value;
       };
 
       elements.send.onclick = sendMessage;
@@ -2351,50 +3664,76 @@
         }
       });
 
-      // 键盘快捷键支持
+      // 键盘快捷键支持（简化版）
       document.addEventListener("keydown", (e) => {
-        // Escape键返回主界面
-        if (
-          e.key === "Escape" &&
-          document.getElementById("detailsArea").style.display === "block"
-        ) {
-          goBack();
-        }
-
-        // 在连接码输入框中按回车自动连接
+        // 在房间号输入框中按回车自动连接
         if (
           e.key === "Enter" &&
-          document.activeElement === elements.theirCode
+          document.activeElement === elements.roomIdInput
         ) {
           e.preventDefault();
-          elements.connect.click();
+          elements.joinRoom.click();
         }
+      });
 
-        // 在应答码输入框中按回车自动连接
-        if (
-          e.key === "Enter" &&
-          document.activeElement === elements.answerCode
-        ) {
-          e.preventDefault();
-          elements.connectAnswer.click();
-        }
+      // 调试函数：显示房间状态
+      window.debugRoom = async function (roomId) {
+        console.log(`=== 房间 ${roomId} 调试信息 ===`);
 
-        // 在生成按钮获得焦点时按回车
-        if (e.key === "Enter" && document.activeElement === elements.generate) {
-          e.preventDefault();
-          elements.generate.click();
-        }
+        try {
+          // 搜索房间Gist
+          const roomGist = await findRoomGist(roomId);
+          if (roomGist) {
+            console.log("找到房间Gist ID:", roomGist.id);
+            const roomData = await readGist(roomGist.id);
+            console.log("房间数据:", roomData);
 
-        // Ctrl+C 快速复制连接码
-        if (
-          e.key === "c" &&
-          e.ctrlKey &&
-          elements.myCode.value &&
-          !elements.copy.disabled
-        ) {
-          e.preventDefault();
-          elements.copy.click();
+            if (roomData.offers) {
+              console.log(`房间内有 ${roomData.offers.length} 个offers:`);
+              roomData.offers.forEach((offer, index) => {
+                const hasAnswer =
+                  roomData.answers &&
+                  roomData.answers.some(
+                    (answer) => answer.offerTimestamp === offer.timestamp
+                  );
+                console.log(
+                  `  Offer ${index + 1} (${offer.timestamp}): ${
+                    hasAnswer ? "已有answer" : "等待answer"
+                  }`
+                );
+              });
+            }
+
+            if (roomData.answers) {
+              console.log(`房间内有 ${roomData.answers.length} 个answers`);
+            }
+          } else {
+            console.log("没有找到房间，房间不存在或搜索失败");
+          }
+
+          // 显示当前连接状态
+          console.log("当前房间ID:", currentRoomId);
+          console.log("当前房间Gist ID:", roomGistId);
+          console.log("WebRTC连接状态:", pc ? pc.connectionState : "未创建");
+        } catch (error) {
+          console.error("调试失败:", error);
         }
+      };
+
+      // 清除缓存的调试函数
+      window.clearRoomCache = function () {
+        localStorage.clear();
+        console.log("已清除所有缓存");
+      };
+
+      // 页面加载完成后初始化
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeToken();
+
+        // 开发模式提示
+        console.log("🔧 调试提示:");
+        console.log("  debugRoom('房间号') - 查看房间状态");
+        console.log("  clearRoomCache() - 清除所有缓存");
       });
     </script>
   </body>
