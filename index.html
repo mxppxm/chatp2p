@@ -10,16 +10,37 @@
 
       body {
         font-family: Arial, sans-serif;
-        padding: 20px;
-        max-width: 600px;
-        margin: 0 auto;
+        padding: 0;
+        margin: 0;
         background: #f5f5f5;
+        height: 100vh;
+        overflow: hidden;
       }
       .container {
         background: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      /* 连接阶段的容器样式 */
+      .container.connecting-phase {
+        max-width: 800px;
+        margin: 0 auto;
+        height: auto;
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 20px;
+      }
+
+      /* 已连接状态的容器样式 */
+      .container.connected-phase {
+        padding: 0;
+        max-width: none;
+        width: 100%;
       }
       h1 {
         text-align: center;
@@ -71,6 +92,19 @@
         padding: 20px;
         margin: 20px 0;
         box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+        flex: 1;
+      }
+
+      /* 连接状态下的消息区域样式 */
+      .connected-phase #messages {
+        height: auto;
+        flex: 1;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        background: #f8f9fa;
+        box-shadow: none;
+        padding: 15px;
       }
       .message {
         margin: 12px 0;
@@ -199,134 +233,630 @@
 
       /* 响应式设计 */
       @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        .container {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+        }
+
         .connection-area {
           flex-direction: column;
           gap: 15px;
         }
+
+        .connection-box {
+          padding: 15px;
+        }
+
+        .connection-box h4 {
+          font-size: 14px;
+        }
+
+        .connection-box button {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        .connection-box textarea {
+          min-height: 60px;
+          font-size: 10px;
+        }
+
+        .connection-progress {
+          padding: 15px;
+          margin: 15px 0;
+        }
+
+        .connection-progress h4 {
+          font-size: 16px;
+        }
+
+        .progress-step {
+          font-size: 13px;
+          margin: 8px 0;
+          padding: 6px 0;
+        }
+
+        .simplified-header {
+          padding: 12px 15px;
+          margin-bottom: 15px;
+        }
+
+        .simplified-header h2 {
+          font-size: 16px;
+        }
+
+        .simplified-header .status-info {
+          font-size: 11px;
+        }
+
+        #messageInput {
+          font-size: 16px; /* 防止iOS放大 */
+          padding: 10px !important;
+        }
+
+        #send {
+          padding: 10px 15px !important;
+          font-size: 13px !important;
+          min-width: 60px !important;
+        }
+
+        #messages {
+          height: 250px;
+          padding: 15px;
+        }
+
+        .connected-phase #messages {
+          padding: 10px;
+        }
+
+        .input-area {
+          padding: 10px !important;
+        }
+
+        .input-row {
+          gap: 8px !important;
+        }
+
+        #imageBtn {
+          min-width: 40px !important;
+          height: 40px !important;
+          padding: 8px !important;
+          font-size: 14px !important;
+        }
+
+        #imagePreview {
+          margin-bottom: 8px !important;
+        }
+
+        #previewImg {
+          max-width: 150px !important;
+          max-height: 100px !important;
+        }
+
+        /* 移动端进度条优化 */
+        .progress-container {
+          padding: 20px !important;
+          max-width: 95% !important;
+        }
+
+        .progress-title {
+          font-size: 16px !important;
+        }
+
+        .progress-text {
+          font-size: 12px !important;
+        }
+
+        .progress-details {
+          font-size: 10px !important;
+        }
+
+        .cancel-transfer-btn {
+          padding: 6px 12px !important;
+          font-size: 11px !important;
+        }
+
+        .message {
+          margin: 10px 0;
+          padding: 10px 14px;
+          max-width: 85%;
+          font-size: 14px;
+        }
+
+        .step {
+          padding: 15px;
+          margin: 15px 0;
+        }
+
+        .step h3 {
+          font-size: 18px;
+        }
+
+        .step p {
+          font-size: 13px;
+        }
+      }
+
+      /* 连接状态控制的显示/隐藏 */
+      .connecting-phase .connection-step {
+        display: block;
+      }
+      .connecting-phase .chat-interface {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .connected-phase .connection-step {
+        display: none;
+      }
+      .connected-phase .chat-interface {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* 过渡动画 */
+      .connection-step,
+      .chat-interface {
+        transition: all 0.5s ease-in-out;
+      }
+
+      /* 连接进度指示器 */
+      .connection-progress {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+        display: none;
+      }
+
+      .connection-progress.active {
+        display: block;
+        animation: pulseProgress 2s infinite;
+      }
+
+      @keyframes pulseProgress {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+        }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 0 4px 16px rgba(0, 123, 255, 0.4);
+        }
+      }
+
+      .progress-step {
+        margin: 10px 0;
+        padding: 8px 0;
+        opacity: 0.3;
+        transition: opacity 0.3s ease;
+      }
+
+      .progress-step.active {
+        opacity: 1;
+        color: #007bff;
+        font-weight: bold;
+      }
+
+      .progress-step.completed {
+        opacity: 1;
+        color: #28a745;
+      }
+
+      .progress-step.completed::before {
+        content: "✓ ";
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      /* 简化后的聊天界面样式 */
+      .simplified-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 0;
+        margin-bottom: 0;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        flex-shrink: 0;
+      }
+
+      .simplified-header h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .simplified-header .status-info {
+        font-size: 12px;
+        opacity: 0.9;
+        margin-top: 5px;
+      }
+
+      /* 聊天界面布局 */
+      .chat-interface {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .connected-phase .chat-interface {
+        height: 100vh;
+      }
+
+      /* 输入区域样式 */
+      .input-area {
+        background: white;
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+        flex-shrink: 0;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      .input-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      /* 图片传输进度条样式 */
+      .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(2px);
+      }
+
+      .progress-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+      }
+
+      .progress-title {
+        margin: 0 0 20px 0;
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .progress-bar-container {
+        background: #f0f0f0;
+        border-radius: 10px;
+        height: 20px;
+        overflow: hidden;
+        margin: 15px 0;
+        position: relative;
+      }
+
+      .progress-bar {
+        background: linear-gradient(90deg, #007bff, #0056b3);
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: progressShine 2s infinite;
+      }
+
+      @keyframes progressShine {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .progress-text {
+        font-size: 14px;
+        color: #666;
+        margin: 10px 0;
+      }
+
+      .progress-details {
+        font-size: 12px;
+        color: #888;
+        margin-top: 10px;
+      }
+
+      .cancel-transfer-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 15px;
+      }
+
+      .cancel-transfer-btn:hover {
+        background: #c82333;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>💬 超简单聊天</h1>
+    <div class="container connecting-phase">
+      <!-- 主标题 - 连接后简化 -->
+      <h1 id="mainTitle">💬 超简单聊天</h1>
 
-      <div class="step">
-        <h3>🚀 超简单连接（只需一次）</h3>
-        <p style="color: #666; margin: 10px 0">
-          💡 <strong>新流程</strong>：A生成连接码 → B粘贴连接 → 系统自动处理应答
-          → 完成！
-        </p>
+      <!-- 简化后的聊天头部 - 连接前隐藏 -->
+      <div
+        id="simplifiedHeader"
+        class="simplified-header"
+        style="display: none"
+      >
+        <h2>💬 聊天已连接</h2>
+        <div class="status-info">与朋友的私密聊天，端到端加密</div>
+      </div>
 
-        <div class="connection-area">
-          <!-- 左侧：生成连接 -->
-          <div class="connection-box" style="border-color: #28a745">
-            <h4 style="color: #28a745">👤 我创建连接</h4>
-            <button
-              id="generate"
-              style="background-color: #28a745; color: white"
-            >
-              🎯 创建连接
-            </button>
-            <button
-              id="copy"
-              disabled
-              style="background-color: #17a2b8; color: white"
-            >
-              📋 复制连接码
-            </button>
-            <textarea
-              id="myCode"
-              placeholder="连接码会在这里生成..."
-              readonly
-            ></textarea>
-            <div
-              style="
-                text-align: center;
-                margin-top: 8px;
-                font-size: 11px;
-                color: #666;
-              "
-            >
-              💡 生成后复制发给朋友
+      <!-- 连接步骤区域 - 连接后隐藏 -->
+      <div id="connectionStep" class="connection-step">
+        <div class="step">
+          <h3>🚀 超简单连接（只需一次）</h3>
+          <p style="color: #666; margin: 10px 0">
+            💡 <strong>新流程</strong>：A生成连接码 → B粘贴连接 →
+            系统自动处理应答 → 完成！
+          </p>
+
+          <div class="connection-area">
+            <!-- 左侧：生成连接 -->
+            <div class="connection-box" style="border-color: #28a745">
+              <h4 style="color: #28a745">👤 我创建连接</h4>
+              <button
+                id="generate"
+                style="background-color: #28a745; color: white"
+              >
+                🎯 创建连接
+              </button>
+              <button
+                id="copy"
+                disabled
+                style="background-color: #17a2b8; color: white"
+              >
+                📋 复制连接码
+              </button>
+              <textarea
+                id="myCode"
+                placeholder="连接码会在这里生成..."
+                readonly
+              ></textarea>
+              <div
+                style="
+                  text-align: center;
+                  margin-top: 8px;
+                  font-size: 11px;
+                  color: #666;
+                "
+              >
+                💡 生成后复制发给朋友
+              </div>
+            </div>
+
+            <!-- 右侧：加入连接 -->
+            <div class="connection-box" style="border-color: #007bff">
+              <h4 style="color: #007bff">👥 我加入连接</h4>
+              <textarea
+                id="theirCode"
+                placeholder="粘贴朋友的连接码..."
+              ></textarea>
+              <button
+                id="connect"
+                style="background-color: #007bff; color: white"
+              >
+                🔗 立即连接
+              </button>
+              <div
+                style="
+                  text-align: center;
+                  margin-top: 8px;
+                  font-size: 11px;
+                  color: #666;
+                "
+              >
+                💡 粘贴代码后点击连接
+              </div>
             </div>
           </div>
 
-          <!-- 右侧：加入连接 -->
-          <div class="connection-box" style="border-color: #007bff">
-            <h4 style="color: #007bff">👥 我加入连接</h4>
-            <textarea
-              id="theirCode"
-              placeholder="粘贴朋友的连接码..."
-            ></textarea>
-            <button
-              id="connect"
-              style="background-color: #007bff; color: white"
-            >
-              🔗 立即连接
-            </button>
-            <div
-              style="
-                text-align: center;
-                margin-top: 8px;
-                font-size: 11px;
-                color: #666;
-              "
-            >
-              💡 粘贴代码后点击连接
-            </div>
+          <div
+            style="
+              text-align: center;
+              margin: 20px 0 10px 0;
+              padding: 10px;
+              background: #f8f9fa;
+              border-radius: 8px;
+            "
+          >
+            <span style="color: #666; font-size: 12px">
+              ✨ 连接成功后，系统会自动处理后续步骤，无需手动操作
+            </span>
           </div>
-        </div>
-
-        <div
-          style="
-            text-align: center;
-            margin: 20px 0 10px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-          "
-        >
-          <span style="color: #666; font-size: 12px">
-            ✨ 连接成功后，系统会自动处理后续步骤，无需手动操作
-          </span>
         </div>
       </div>
 
+      <!-- 连接进度指示器 -->
+      <div id="connectionProgress" class="connection-progress">
+        <h4 style="margin: 0 0 15px 0; color: #333">🔄 连接进度</h4>
+        <div id="step1" class="progress-step">1. 生成连接信息</div>
+        <div id="step2" class="progress-step">2. 建立网络通道</div>
+        <div id="step3" class="progress-step">3. 验证连接安全</div>
+        <div id="step4" class="progress-step">4. 启动聊天功能</div>
+      </div>
+
+      <!-- 状态指示器 -->
       <div id="status" class="status" style="background: #f8f9fa; color: #666">
         等待连接...
       </div>
 
-      <div class="flex" style="margin-bottom: 15px">
-        <input
-          id="messageInput"
-          placeholder="输入消息..."
-          disabled
-          style="
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin-right: 10px;
-            font-size: 14px;
-          "
-        />
-        <button
-          id="send"
-          disabled
-          style="
-            background-color: #28a745;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            min-width: 80px;
-          "
-        >
-          📤 发送
-        </button>
-      </div>
+      <!-- 聊天界面 -->
+      <div id="chatInterface" class="chat-interface">
+        <div id="messages"></div>
 
-      <div id="messages"></div>
+        <!-- 输入区域 -->
+        <div class="input-area">
+          <div class="input-container">
+            <!-- 图片预览区域 -->
+            <div id="imagePreview" style="display: none; margin-bottom: 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  border-radius: 8px;
+                  padding: 10px;
+                  border: 1px solid #dee2e6;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <span style="font-size: 12px; color: #666">📷 图片预览</span>
+                  <button
+                    id="cancelImage"
+                    style="
+                      background: none;
+                      border: none;
+                      color: #dc3545;
+                      cursor: pointer;
+                      font-size: 16px;
+                    "
+                  >
+                    ✕
+                  </button>
+                </div>
+                <img
+                  id="previewImg"
+                  style="
+                    max-width: 200px;
+                    max-height: 150px;
+                    border-radius: 6px;
+                    display: block;
+                  "
+                />
+                <div
+                  id="imageInfo"
+                  style="font-size: 11px; color: #888; margin-top: 5px"
+                ></div>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <input
+                id="messageInput"
+                placeholder="输入消息或粘贴图片..."
+                disabled
+                style="
+                  flex: 1;
+                  padding: 12px;
+                  border: 2px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  min-height: 20px;
+                  resize: none;
+                  outline: none;
+                "
+              />
+              <!-- 图片选择按钮 -->
+              <button
+                id="imageBtn"
+                disabled
+                title="选择图片"
+                style="
+                  background-color: #6c757d;
+                  color: white;
+                  padding: 12px;
+                  border: none;
+                  border-radius: 8px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  min-width: 48px;
+                  height: 48px;
+                "
+              >
+                📷
+              </button>
+              <!-- 发送按钮 -->
+              <button
+                id="send"
+                disabled
+                style="
+                  background-color: #28a745;
+                  color: white;
+                  padding: 12px 20px;
+                  border: none;
+                  border-radius: 8px;
+                  font-weight: bold;
+                  min-width: 80px;
+                  cursor: pointer;
+                  height: 48px;
+                "
+              >
+                📤 发送
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 隐藏的文件输入 -->
+        <input
+          type="file"
+          id="fileInput"
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
     </div>
 
     <script>
@@ -340,16 +870,450 @@
         messageInput: document.getElementById("messageInput"),
         send: document.getElementById("send"),
         messages: document.getElementById("messages"),
+        // 新增的UI元素
+        container: document.querySelector(".container"),
+        mainTitle: document.getElementById("mainTitle"),
+        simplifiedHeader: document.getElementById("simplifiedHeader"),
+        connectionStep: document.getElementById("connectionStep"),
+        connectionProgress: document.getElementById("connectionProgress"),
+        chatInterface: document.getElementById("chatInterface"),
+        // 进度步骤元素
+        step1: document.getElementById("step1"),
+        step2: document.getElementById("step2"),
+        step3: document.getElementById("step3"),
+        step4: document.getElementById("step4"),
+        // 图片相关元素
+        imageBtn: document.getElementById("imageBtn"),
+        fileInput: document.getElementById("fileInput"),
+        imagePreview: document.getElementById("imagePreview"),
+        previewImg: document.getElementById("previewImg"),
+        imageInfo: document.getElementById("imageInfo"),
+        cancelImage: document.getElementById("cancelImage"),
       };
 
       let pc,
         channel,
-        waiting = false;
+        waiting = false,
+        currentImage = null, // 当前选择的图片数据
+        isTransferring = false, // 是否正在传输
+        transferCancelled = false; // 传输是否被取消
+
+      // UI状态管理
+      const UIState = {
+        INITIAL: "connecting-phase",
+        CONNECTING: "connecting-phase",
+        CONNECTED: "connected-phase",
+      };
+
+      let currentUIState = UIState.INITIAL;
+
+      // 切换UI状态
+      function setUIState(state) {
+        currentUIState = state;
+        elements.container.className = `container ${state}`;
+
+        switch (state) {
+          case UIState.CONNECTED:
+            // 连接成功后的UI变化
+            elements.mainTitle.style.display = "none";
+            elements.simplifiedHeader.style.display = "block";
+            elements.connectionStep.style.display = "none";
+            elements.connectionProgress.classList.remove("active");
+            elements.status.style.display = "none";
+            break;
+          default:
+            // 连接前的UI状态
+            elements.mainTitle.style.display = "block";
+            elements.simplifiedHeader.style.display = "none";
+            elements.connectionStep.style.display = "block";
+            elements.status.style.display = "block";
+        }
+      }
+
+      // 更新连接进度
+      function updateProgress(stepNumber, status = "active") {
+        // 重置所有步骤
+        [
+          elements.step1,
+          elements.step2,
+          elements.step3,
+          elements.step4,
+        ].forEach((step, index) => {
+          step.className = "progress-step";
+          if (index < stepNumber - 1) {
+            step.classList.add("completed");
+          } else if (index === stepNumber - 1) {
+            step.classList.add(status);
+          }
+        });
+
+        // 显示进度指示器
+        if (stepNumber > 0 && stepNumber < 5) {
+          elements.connectionProgress.classList.add("active");
+        }
+      }
 
       // 更新状态
       function setStatus(text, color = "#666") {
         elements.status.textContent = text;
         elements.status.style.color = color;
+      }
+
+      // 图片处理函数
+      function compressImage(
+        file,
+        maxWidth = 800,
+        maxHeight = 600,
+        quality = 0.8
+      ) {
+        return new Promise((resolve) => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+
+          img.onload = () => {
+            // 计算压缩后的尺寸
+            let { width, height } = img;
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+
+            if (ratio < 1) {
+              width *= ratio;
+              height *= ratio;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // 绘制并压缩
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(resolve, "image/jpeg", quality);
+          };
+
+          img.src = URL.createObjectURL(file);
+        });
+      }
+
+      // 处理图片文件
+      async function handleImageFile(file) {
+        if (!file.type.startsWith("image/")) {
+          alert("请选择图片文件！");
+          return;
+        }
+
+        try {
+          // 压缩图片
+          const compressedFile = await compressImage(file);
+
+          // 转换为Base64
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            currentImage = {
+              data: e.target.result,
+              name: file.name,
+              size: compressedFile.size,
+              type: compressedFile.type,
+            };
+
+            // 显示预览
+            showImagePreview(currentImage);
+          };
+          reader.readAsDataURL(compressedFile);
+        } catch (error) {
+          console.error("图片处理失败:", error);
+          alert("图片处理失败，请重试！");
+        }
+      }
+
+      // 显示图片预览
+      function showImagePreview(imageData) {
+        elements.previewImg.src = imageData.data;
+        elements.imageInfo.textContent = `${imageData.name} (${(
+          imageData.size / 1024
+        ).toFixed(1)}KB)`;
+        elements.imagePreview.style.display = "block";
+      }
+
+      // 隐藏图片预览
+      function hideImagePreview() {
+        elements.imagePreview.style.display = "none";
+        currentImage = null;
+        elements.fileInput.value = "";
+      }
+
+      // 处理粘贴事件
+      function handlePaste(e) {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type.startsWith("image/")) {
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (file) {
+              handleImageFile(file);
+            }
+            break;
+          }
+        }
+      }
+
+      // 显示传输进度条
+      function showTransferProgress(fileName, fileSize) {
+        // 创建进度条覆盖层
+        const overlay = document.createElement("div");
+        overlay.className = "progress-overlay";
+        overlay.id = "progressOverlay";
+
+        overlay.innerHTML = `
+          <div class="progress-container">
+            <h3 class="progress-title">📤 发送图片</h3>
+            <div class="progress-text">正在发送: ${fileName}</div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div id="progressText" class="progress-text">0%</div>
+            <div class="progress-details">
+              <div>文件大小: ${formatFileSize(fileSize)}</div>
+              <div id="transferSpeed">传输速度: 计算中...</div>
+              <div id="remainingTime">剩余时间: 计算中...</div>
+            </div>
+            <button class="cancel-transfer-btn" onclick="cancelTransfer()">取消传输</button>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+        return overlay;
+      }
+
+      // 更新传输进度
+      function updateTransferProgress(percentage, speed, remaining) {
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+        const transferSpeed = document.getElementById("transferSpeed");
+        const remainingTime = document.getElementById("remainingTime");
+
+        if (progressBar) {
+          progressBar.style.width = percentage + "%";
+        }
+        if (progressText) {
+          progressText.textContent = Math.round(percentage) + "%";
+        }
+        if (transferSpeed && speed) {
+          transferSpeed.textContent = `传输速度: ${formatFileSize(speed)}/s`;
+        }
+        if (remainingTime && remaining) {
+          remainingTime.textContent = `剩余时间: ${formatTime(remaining)}`;
+        }
+      }
+
+      // 隐藏传输进度条
+      function hideTransferProgress() {
+        const overlay = document.getElementById("progressOverlay");
+        if (overlay) {
+          document.body.removeChild(overlay);
+        }
+        isTransferring = false;
+        transferCancelled = false;
+      }
+
+      // 取消传输
+      function cancelTransfer() {
+        transferCancelled = true;
+        hideTransferProgress();
+        alert("图片传输已取消");
+      }
+
+      // 格式化文件大小
+      function formatFileSize(bytes) {
+        if (bytes === 0) return "0 B";
+        const k = 1024;
+        const sizes = ["B", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+      }
+
+      // 格式化时间
+      function formatTime(seconds) {
+        if (!seconds || seconds === Infinity) return "未知";
+        if (seconds < 60) return Math.round(seconds) + "秒";
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.round(seconds % 60);
+        return `${minutes}分${remainingSeconds}秒`;
+      }
+
+      // 分块传输图片数据
+      async function sendImageInChunks(imageData, chunkSize = 16384) {
+        // 16KB chunks
+        const data = JSON.stringify(imageData);
+        const totalSize = data.length;
+        const totalChunks = Math.ceil(totalSize / chunkSize);
+
+        // 发送传输开始信号
+        const transferId = Date.now().toString();
+        channel.send(
+          JSON.stringify({
+            type: "transfer_start",
+            transferId: transferId,
+            totalChunks: totalChunks,
+            totalSize: totalSize,
+            fileName: imageData.name,
+          })
+        );
+
+        let transferredBytes = 0;
+        const startTime = Date.now();
+
+        for (let i = 0; i < totalChunks; i++) {
+          if (transferCancelled) {
+            // 发送取消信号
+            channel.send(
+              JSON.stringify({
+                type: "transfer_cancel",
+                transferId: transferId,
+              })
+            );
+            throw new Error("传输已取消");
+          }
+
+          const start = i * chunkSize;
+          const end = Math.min(start + chunkSize, totalSize);
+          const chunk = data.slice(start, end);
+
+          // 发送数据块
+          channel.send(
+            JSON.stringify({
+              type: "transfer_chunk",
+              transferId: transferId,
+              chunkIndex: i,
+              data: chunk,
+            })
+          );
+
+          transferredBytes += chunk.length;
+          const percentage = (transferredBytes / totalSize) * 100;
+
+          // 计算传输速度和剩余时间
+          const elapsed = (Date.now() - startTime) / 1000;
+          const speed = transferredBytes / elapsed;
+          const remaining = (totalSize - transferredBytes) / speed;
+
+          // 更新进度
+          updateTransferProgress(percentage, speed, remaining);
+
+          // 给界面一点时间更新
+          await new Promise((resolve) => setTimeout(resolve, 1));
+        }
+
+        // 发送传输完成信号
+        channel.send(
+          JSON.stringify({
+            type: "transfer_complete",
+            transferId: transferId,
+          })
+        );
+      }
+
+      // 接收端传输状态管理
+      const receivingTransfers = new Map();
+
+      // 处理传输开始
+      function handleTransferStart(data) {
+        receivingTransfers.set(data.transferId, {
+          totalChunks: data.totalChunks,
+          totalSize: data.totalSize,
+          fileName: data.fileName,
+          receivedChunks: new Array(data.totalChunks),
+          receivedCount: 0,
+        });
+
+        // 显示接收进度条
+        showReceiveProgress(data.fileName, data.totalSize);
+      }
+
+      // 处理传输数据块
+      function handleTransferChunk(data) {
+        const transfer = receivingTransfers.get(data.transferId);
+        if (!transfer) return;
+
+        transfer.receivedChunks[data.chunkIndex] = data.data;
+        transfer.receivedCount++;
+
+        const percentage =
+          (transfer.receivedCount / transfer.totalChunks) * 100;
+        updateReceiveProgress(percentage);
+      }
+
+      // 处理传输完成
+      function handleTransferComplete(data) {
+        const transfer = receivingTransfers.get(data.transferId);
+        if (!transfer) return;
+
+        // 重组完整数据
+        const completeData = transfer.receivedChunks.join("");
+
+        try {
+          const imageData = JSON.parse(completeData);
+          addMessage(imageData, false);
+          hideReceiveProgress();
+        } catch (error) {
+          console.error("重组图片数据失败:", error);
+          alert("接收图片失败");
+          hideReceiveProgress();
+        }
+
+        receivingTransfers.delete(data.transferId);
+      }
+
+      // 处理传输取消
+      function handleTransferCancel(data) {
+        receivingTransfers.delete(data.transferId);
+        hideReceiveProgress();
+        alert("对方取消了图片传输");
+      }
+
+      // 显示接收进度条
+      function showReceiveProgress(fileName, fileSize) {
+        const overlay = document.createElement("div");
+        overlay.className = "progress-overlay";
+        overlay.id = "receiveProgressOverlay";
+
+        overlay.innerHTML = `
+          <div class="progress-container">
+            <h3 class="progress-title">📥 接收图片</h3>
+            <div class="progress-text">正在接收: ${fileName}</div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="receiveProgressBar" style="background: linear-gradient(90deg, #28a745, #20c997);"></div>
+            </div>
+            <div id="receiveProgressText" class="progress-text">0%</div>
+            <div class="progress-details">
+              <div>文件大小: ${formatFileSize(fileSize)}</div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+      }
+
+      // 更新接收进度
+      function updateReceiveProgress(percentage) {
+        const progressBar = document.getElementById("receiveProgressBar");
+        const progressText = document.getElementById("receiveProgressText");
+
+        if (progressBar) {
+          progressBar.style.width = percentage + "%";
+        }
+        if (progressText) {
+          progressText.textContent = Math.round(percentage) + "%";
+        }
+      }
+
+      // 隐藏接收进度条
+      function hideReceiveProgress() {
+        const overlay = document.getElementById("receiveProgressOverlay");
+        if (overlay) {
+          document.body.removeChild(overlay);
+        }
       }
 
       // SDP压缩器 - 简单Base64压缩，避免解析问题
@@ -465,14 +1429,60 @@
       }
 
       // 显示消息
-      function addMessage(text, isMe = false) {
+      function addMessage(content, isMe = false) {
         const div = document.createElement("div");
         div.className = `message ${isMe ? "me" : "them"}`;
 
         // 创建消息内容
         const messageContent = document.createElement("div");
-        messageContent.textContent = text;
         messageContent.style.marginBottom = "4px";
+
+        // 检查是否是图片消息
+        if (typeof content === "object" && content.type === "image") {
+          // 图片消息
+          const img = document.createElement("img");
+          img.src = content.data;
+          img.style.maxWidth = "250px";
+          img.style.maxHeight = "200px";
+          img.style.borderRadius = "8px";
+          img.style.cursor = "pointer";
+          img.style.display = "block";
+
+          // 添加图片信息
+          const imageInfo = document.createElement("div");
+          imageInfo.textContent = content.name;
+          imageInfo.style.fontSize = "11px";
+          imageInfo.style.opacity = "0.8";
+          imageInfo.style.marginTop = "4px";
+
+          // 点击放大图片
+          img.onclick = () => {
+            const modal = document.createElement("div");
+            modal.style.cssText = `
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+              background: rgba(0,0,0,0.8); display: flex; align-items: center;
+              justify-content: center; z-index: 1000; cursor: pointer;
+            `;
+
+            const fullImg = document.createElement("img");
+            fullImg.src = content.data;
+            fullImg.style.cssText = `
+              max-width: 90%; max-height: 90%; border-radius: 8px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            `;
+
+            modal.appendChild(fullImg);
+            document.body.appendChild(modal);
+
+            modal.onclick = () => document.body.removeChild(modal);
+          };
+
+          messageContent.appendChild(img);
+          messageContent.appendChild(imageInfo);
+        } else {
+          // 文本消息
+          messageContent.textContent = content;
+        }
 
         // 创建时间戳
         const timestamp = document.createElement("div");
@@ -504,11 +1514,16 @@
 
         pc.onicecandidate = (e) => {
           if (!e.candidate) {
+            // 更新进度：生成连接信息完成
+            updateProgress(1, "completed");
+            updateProgress(2, "active");
+
             // 使用压缩器生成简洁的连接码
             const compressed = compressSDP(pc.localDescription);
             elements.myCode.value = compressed;
             elements.copy.disabled = false;
             setStatus("连接码已生成，复制发给朋友", "#28a745");
+
             console.log(
               "压缩前:",
               JSON.stringify(pc.localDescription).length,
@@ -528,8 +1543,31 @@
         };
 
         pc.onconnectionstatechange = () => {
-          if (pc.connectionState === "connected") {
-            setStatus("连接成功！可以聊天了", "#28a745");
+          console.log("连接状态变化:", pc.connectionState);
+
+          switch (pc.connectionState) {
+            case "connecting":
+              updateProgress(3, "active");
+              setStatus("正在建立安全连接...", "#ffc107");
+              break;
+            case "connected":
+              // 完成所有步骤
+              updateProgress(4, "completed");
+              setStatus("连接成功！", "#28a745");
+
+              // 延迟切换到聊天界面，让用户看到完成状态
+              setTimeout(() => {
+                setUIState(UIState.CONNECTED);
+              }, 1500);
+              break;
+            case "disconnected":
+              setStatus("连接已断开", "#dc3545");
+              // 可以选择重置UI状态
+              break;
+            case "failed":
+              setStatus("连接失败，请重试", "#dc3545");
+              elements.connectionProgress.classList.remove("active");
+              break;
           }
         };
 
@@ -544,37 +1582,128 @@
       // 设置数据通道
       function setupChannel() {
         channel.onopen = () => {
+          console.log("数据通道已打开");
           elements.messageInput.disabled = false;
           elements.send.disabled = false;
-          setStatus("聊天已就绪", "#28a745");
+          elements.imageBtn.disabled = false;
+
+          // 如果还没有切换到连接状态，这里再次确保切换
+          if (currentUIState !== UIState.CONNECTED) {
+            updateProgress(4, "completed");
+            setTimeout(() => {
+              setUIState(UIState.CONNECTED);
+            }, 500);
+          }
         };
 
         channel.onmessage = (e) => {
-          addMessage(e.data, false);
+          try {
+            // 尝试解析JSON，看是否是传输相关消息
+            const data = JSON.parse(e.data);
+
+            // 处理分块传输消息
+            if (data.type === "transfer_start") {
+              handleTransferStart(data);
+            } else if (data.type === "transfer_chunk") {
+              handleTransferChunk(data);
+            } else if (data.type === "transfer_complete") {
+              handleTransferComplete(data);
+            } else if (data.type === "transfer_cancel") {
+              handleTransferCancel(data);
+            } else if (data.type === "image") {
+              addMessage(data, false);
+            } else {
+              addMessage(data.text || e.data, false);
+            }
+          } catch (err) {
+            // 如果解析失败，当作普通文本消息
+            addMessage(e.data, false);
+          }
+        };
+
+        channel.onclose = () => {
+          console.log("数据通道已关闭");
+          elements.messageInput.disabled = true;
+          elements.send.disabled = true;
+          elements.imageBtn.disabled = true;
+        };
+
+        channel.onerror = (error) => {
+          console.error("数据通道错误:", error);
         };
       }
 
       // 发送消息
-      function sendMessage() {
+      async function sendMessage() {
         const text = elements.messageInput.value.trim();
-        if (!text || !channel || channel.readyState !== "open") {
-          if (!text) return;
-          if (!channel || channel.readyState !== "open") {
-            alert("连接尚未建立，无法发送消息");
-          }
+
+        if (!channel || channel.readyState !== "open") {
+          alert("连接尚未建立，无法发送消息");
           return;
         }
 
-        try {
-          // 通过数据通道发送消息
-          channel.send(text);
+        // 检查是否有图片要发送
+        if (currentImage) {
+          if (isTransferring) {
+            alert("正在传输图片，请稍候...");
+            return;
+          }
 
-          // 显示自己发送的消息
-          addMessage(text, true);
-          elements.messageInput.value = "";
-        } catch (error) {
-          console.error("发送消息失败:", error);
-          alert("发送消息失败: " + error.message);
+          try {
+            isTransferring = true;
+
+            // 构建图片消息
+            const imageMessage = {
+              type: "image",
+              data: currentImage.data,
+              name: currentImage.name,
+              size: currentImage.size,
+            };
+
+            // 如果有文本，添加说明
+            if (text) {
+              imageMessage.caption = text;
+            }
+
+            // 显示进度条
+            showTransferProgress(currentImage.name, currentImage.size);
+
+            // 使用分块传输发送图片
+            await sendImageInChunks(imageMessage);
+
+            // 传输成功，显示自己发送的消息
+            const displayMessage = { ...imageMessage };
+            if (text) {
+              // 如果有说明文字，先显示图片再显示文字
+              addMessage(displayMessage, true);
+              addMessage(text, true);
+            } else {
+              addMessage(displayMessage, true);
+            }
+
+            // 隐藏进度条并清理
+            hideTransferProgress();
+            elements.messageInput.value = "";
+            hideImagePreview();
+          } catch (error) {
+            console.error("发送图片失败:", error);
+            hideTransferProgress();
+            if (!transferCancelled) {
+              alert("发送图片失败: " + error.message);
+            }
+          }
+        } else if (text) {
+          try {
+            // 发送文本消息
+            channel.send(text);
+
+            // 显示自己发送的消息
+            addMessage(text, true);
+            elements.messageInput.value = "";
+          } catch (error) {
+            console.error("发送消息失败:", error);
+            alert("发送消息失败: " + error.message);
+          }
         }
       }
 
@@ -584,6 +1713,9 @@
       elements.generate.onclick = async () => {
         try {
           console.log("点击生成连接按钮");
+
+          // 开始连接流程，显示进度
+          updateProgress(1, "active");
           setStatus("正在生成连接码...", "#ffc107");
 
           pc = createConnection();
@@ -599,6 +1731,7 @@
         } catch (error) {
           console.error("生成连接码失败:", error);
           setStatus("生成失败: " + error.message, "#dc3545");
+          elements.connectionProgress.classList.remove("active");
           alert("生成连接码失败: " + error.message);
         }
       };
@@ -641,11 +1774,23 @@
           }
 
           if (desc.type === "offer") {
+            // 开始连接流程
+            updateProgress(1, "active");
             setStatus("正在连接...", "#ffc107");
+
             pc = createConnection();
+
+            // 步骤1: 解析连接信息
+            updateProgress(1, "completed");
+            updateProgress(2, "active");
+
             await pc.setRemoteDescription(desc);
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
+
+            // 步骤2: 生成应答完成
+            updateProgress(2, "completed");
+            updateProgress(3, "active");
 
             // 自动生成应答码并显示给用户
             const answerCode = compressSDP(pc.localDescription);
@@ -670,13 +1815,18 @@
               setStatus("应答码已生成，请点击复制按钮发给朋友", "#ffc107");
             }
           } else if (desc.type === "answer" && waiting) {
+            // 接收应答，完成连接
+            updateProgress(3, "active");
+            setStatus("正在完成连接...", "#ffc107");
+
             await pc.setRemoteDescription(desc);
             waiting = false;
-            setStatus("连接建立中...", "#ffc107");
           }
         } catch (e) {
           console.error("连接失败:", e);
-          alert("连接码格式错误");
+          setStatus("连接失败: " + e.message, "#dc3545");
+          elements.connectionProgress.classList.remove("active");
+          alert("连接码格式错误或连接失败");
         }
       };
 
@@ -684,6 +1834,33 @@
       elements.messageInput.onkeypress = (e) => {
         if (e.key === "Enter") sendMessage();
       };
+
+      // 图片相关事件绑定
+      elements.imageBtn.onclick = () => {
+        elements.fileInput.click();
+      };
+
+      elements.fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleImageFile(file);
+        }
+      };
+
+      elements.cancelImage.onclick = hideImagePreview;
+
+      // 绑定粘贴事件
+      elements.messageInput.addEventListener("paste", handlePaste);
+      document.addEventListener("paste", (e) => {
+        // 只有当输入框获得焦点或者没有其他输入框时才处理粘贴
+        if (
+          document.activeElement === elements.messageInput ||
+          !document.activeElement ||
+          document.activeElement === document.body
+        ) {
+          handlePaste(e);
+        }
+      });
     </script>
   </body>
 </html>
