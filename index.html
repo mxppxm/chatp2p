@@ -2,10 +2,15 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>超简单聊天</title>
     <style>
       * {
         box-sizing: border-box; /* 全局设置，避免元素超出 */
+        -webkit-tap-highlight-color: transparent; /* 移除iOS点击高亮 */
       }
 
       body {
@@ -17,6 +22,9 @@
         height: 100vh;
         overflow: hidden;
         position: relative;
+        /* 移动端滚动优化 */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
       }
 
       body::before {
@@ -890,6 +898,113 @@
         color: white;
       }
 
+      /* 房间号展示样式 */
+      .room-number-display {
+        margin: 20px 0;
+        animation: slideInUp 0.6s ease-out;
+      }
+
+      .room-number-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .room-number-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 1px,
+          transparent 1px
+        );
+        background-size: 20px 20px;
+        animation: sparkle 3s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes sparkle {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      .room-number-code {
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 8px;
+        margin: 15px 0;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        font-family: "Courier New", monospace;
+        position: relative;
+        z-index: 1;
+      }
+
+      .room-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin: 20px 0 15px 0;
+        flex-wrap: wrap;
+      }
+
+      .copy-room-btn,
+      .share-room-btn {
+        background: rgba(255, 255, 255, 0.9);
+        color: #667eea;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        min-width: 120px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .copy-room-btn:hover,
+      .share-room-btn:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .room-hint {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       /* 房间输入界面响应式 */
       @media (max-width: 768px) {
         .room-input-section {
@@ -901,8 +1016,143 @@
           font-size: 20px;
         }
 
+        /* 房间号展示移动端适配 */
+        .room-number-card {
+          margin: 10px;
+          padding: 20px;
+        }
+
+        .room-number-code {
+          font-size: 24px;
+          letter-spacing: 4px;
+          padding: 12px;
+        }
+
+        .room-actions {
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .copy-room-btn,
+        .share-room-btn {
+          width: 100%;
+          max-width: 200px;
+          padding: 12px 20px;
+          font-size: 16px;
+        }
+
+        .room-hint {
+          font-size: 13px;
+          line-height: 1.4;
+        }
+
+        /* 按钮移动端优化 */
+        .action-button {
+          min-height: 50px;
+          font-size: 16px;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+
+        /* 通用按钮移动端优化 */
+        button {
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .action-button.secondary,
+        .action-button.primary {
+          padding: 18px;
+        }
+
+        /* 输入框移动端优化 */
+        .code-area {
+          font-size: 18px !important;
+          padding: 15px !important;
+          min-height: 50px;
+          -webkit-appearance: none;
+          appearance: none;
+          border-radius: 8px;
+        }
+
+        /* 消息区域移动端优化 */
+        #messages {
+          padding: 10px;
+        }
+
+        .message {
+          font-size: 15px;
+          line-height: 1.4;
+          max-width: 85%;
+        }
+
+        /* 输入区域移动端优化 */
+        #messageInput {
+          font-size: 16px;
+          padding: 12px 15px;
+          min-height: 50px;
+        }
+
+        #sendBtn,
+        #imageBtn {
+          min-height: 50px;
+          min-width: 50px;
+          font-size: 16px;
+        }
+
+        /* 聊天标题移动端优化 */
+        h1 {
+          font-size: 20px;
+          margin-bottom: 15px;
+        }
+
         .welcome-text p {
           font-size: 14px;
+        }
+      }
+
+      /* 超小屏幕优化 (手机竖屏) */
+      @media (max-width: 480px) {
+        .container.connecting-phase {
+          padding: 15px;
+          margin: 0;
+        }
+
+        h1 {
+          font-size: 18px;
+          margin-bottom: 10px;
+        }
+
+        .room-number-code {
+          font-size: 20px;
+          letter-spacing: 2px;
+          padding: 10px;
+        }
+
+        .room-number-card {
+          padding: 15px;
+        }
+
+        .action-button {
+          padding: 15px;
+          font-size: 15px;
+        }
+
+        /* 水平布局改为垂直布局 */
+        .room-input-section > div:first-child {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .welcome-text h3 {
+          font-size: 18px;
+        }
+
+        .welcome-text p {
+          font-size: 13px;
         }
       }
 
@@ -1147,6 +1397,29 @@
             </button>
           </div>
 
+          <!-- 房间号展示区域 -->
+          <div
+            id="roomNumberDisplay"
+            class="room-number-display"
+            style="display: none"
+          >
+            <div class="room-number-card">
+              <h3 style="margin: 0 0 10px 0; color: #333; font-size: 18px">
+                🎯 您的房间号
+              </h3>
+              <div class="room-number-code" id="roomNumberCode">ABC123</div>
+              <div class="room-actions">
+                <button id="copyRoomBtn" class="copy-room-btn">
+                  📋 复制房间号
+                </button>
+                <button id="shareRoomBtn" class="share-room-btn">
+                  🔗 分享房间
+                </button>
+              </div>
+              <p class="room-hint">将房间号分享给朋友，等待他们加入聊天</p>
+            </div>
+          </div>
+
           <div id="roomStatus" class="step-hint" style="display: none">
             <p id="roomStatusText">🔄 正在连接房间...</p>
           </div>
@@ -1347,6 +1620,11 @@
         createRoomBtn: document.getElementById("createRoomBtn"),
         joinRoomBtn: document.getElementById("joinRoomBtn"),
         joinRoomSection: document.getElementById("joinRoomSection"),
+        // 房间号展示相关元素
+        roomNumberDisplay: document.getElementById("roomNumberDisplay"),
+        roomNumberCode: document.getElementById("roomNumberCode"),
+        copyRoomBtn: document.getElementById("copyRoomBtn"),
+        shareRoomBtn: document.getElementById("shareRoomBtn"),
       };
 
       let pc,
@@ -3731,14 +4009,18 @@
       // 创建房间按钮事件
       elements.createRoomBtn.onclick = async () => {
         const newRoomId = generateRoomId();
-        showToast(`房间号已生成: ${newRoomId}`);
+
+        // 显示房间号
+        elements.roomNumberCode.textContent = newRoomId;
+        elements.roomNumberDisplay.style.display = "block";
 
         // 自动复制房间号
         try {
           await navigator.clipboard.writeText(newRoomId);
-          showToast(`房间号 ${newRoomId} 已复制到剪贴板！`);
+          showToast(`房间号已复制到剪贴板！`);
         } catch (error) {
           console.warn("自动复制失败:", error);
+          showToast(`房间号已生成: ${newRoomId}`);
         }
 
         // 自动连接到房间
@@ -3747,6 +4029,44 @@
         elements.roomStatusText.textContent = "🎯 创建房间中...";
 
         await createOfferAndWait(newRoomId);
+      };
+
+      // 复制房间号按钮事件
+      elements.copyRoomBtn.onclick = async () => {
+        const roomId = elements.roomNumberCode.textContent;
+        try {
+          await navigator.clipboard.writeText(roomId);
+          showToast(`房间号 ${roomId} 已复制到剪贴板！`);
+        } catch (error) {
+          console.warn("复制失败:", error);
+          showToast("复制失败，请手动复制", "error");
+        }
+      };
+
+      // 分享房间按钮事件
+      elements.shareRoomBtn.onclick = async () => {
+        const roomId = elements.roomNumberCode.textContent;
+        const shareText = `加入我的聊天房间，房间号：${roomId}`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "聊天房间邀请",
+              text: shareText,
+              url: window.location.href,
+            });
+          } catch (error) {
+            console.log("分享取消或失败:", error);
+          }
+        } else {
+          // 降级：复制分享文本
+          try {
+            await navigator.clipboard.writeText(shareText);
+            showToast("邀请文本已复制到剪贴板！");
+          } catch (error) {
+            showToast(`请手动复制：${shareText}`, "info");
+          }
+        }
       };
 
       // 加入房间按钮事件
